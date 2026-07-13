@@ -12,8 +12,8 @@
 
 | 页面 | 预览 |
 |------|------|
-| **🔐 登录页** — 毛玻璃卡片 + Bing 每日壁纸 + Passkey/2FA | ![登录页](https://raw.githubusercontent.com/Hawaiine/luci-theme-oasisic/main/assets/screenshots/login.png) |
-| **📊 仪表盘** — 探针风格概览 + Nikki 代理状态 + 拓扑 + 流量图 | ![仪表盘](https://raw.githubusercontent.com/Hawaiine/luci-theme-oasisic/main/assets/screenshots/dashboard.png) |
+| **🔐 登录页** — 毛玻璃卡片 + Bing 每日壁纸 + Passkey/2FA | ![登录页](https://github.com/Hawaiine/luci-theme-oasisic/blob/main/assets/screenshots/login.png?raw=true) |
+| **📊 仪表盘** — 探针风格概览 + Nikki 代理状态 + 拓扑 + 流量图 | ![仪表盘](https://github.com/Hawaiine/luci-theme-oasisic/blob/main/assets/screenshots/dashboard.png?raw=true) |
 
 ---
 
