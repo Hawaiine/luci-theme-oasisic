@@ -10,6 +10,14 @@
 
 ---
 
+### 🌏 中文版本
+
+完整的中文文档请查看 **[README.zh-CN.md](README.zh-CN.md)**，包含详细的功能介绍、安装指南、设计系统和配置说明。
+
+For the full Chinese documentation, please see **[README.zh-CN.md](README.zh-CN.md)**.
+
+---
+
 ## 📸 截图预览
 
 | 页面 | 预览 |
