@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="<%=luci.i18n.media_plain()%>" data-theme="<%=L.theme_mode()%>" data-version="1.0.0">
+<html lang="<%=luci.i18n.media_plain()%>" data-theme="<%=L.theme_mode()%>" data-version="1.0.0"
+	  data-theme-color="<%=luci.model.uci.cursor():get('oasisic', 'config', 'theme_color') or 'blue'%>"
+	  data-sidebar="<%=luci.model.uci.cursor():get('oasisic', 'config', 'sidebar_mode') or 'expanded'%>">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +12,7 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 	<link rel="stylesheet" href="<%=media%>/css/oasisic.css">
+	<link rel="stylesheet" href="<%=media%>/css/presets.css">
 	<link rel="stylesheet" href="<%=media%>/css/oasisic-dark.css" media="(prefers-color-scheme: dark)">
 	<link rel="stylesheet" href="<%=media%>/css/nikki.css">
 	<link rel="icon" type="image/svg+xml" href="<%=media%>/img/logo.svg">

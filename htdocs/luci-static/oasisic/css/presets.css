@@ -1,0 +1,45 @@
+/*!
+ * luci-theme-oasisic — 多主题色预设
+ * v1.0.0
+ */
+
+/* ===== 科技蓝（默认） ===== */
+[data-theme-color="blue"] {
+  --primary: #0071e3;
+  --primary-hover: #0077ed;
+  --primary-active: #006edb;
+  --primary-light: rgba(0, 113, 227, 0.08);
+}
+
+/* ===== 翡翠绿 ===== */
+[data-theme-color="green"] {
+  --primary: #34c759;
+  --primary-hover: #30d158;
+  --primary-active: #28a745;
+  --primary-light: rgba(52, 199, 89, 0.08);
+}
+
+/* ===== 极光紫 ===== */
+[data-theme-color="purple"] {
+  --primary: #af52de;
+  --primary-hover: #c06ef4;
+  --primary-active: #9b3ec9;
+  --primary-light: rgba(175, 82, 222, 0.08);
+}
+
+/* ===== 暖阳橙 ===== */
+[data-theme-color="orange"] {
+  --primary: #ff9500;
+  --primary-hover: #ffaa33;
+  --primary-active: #e68600;
+  --primary-light: rgba(255, 149, 0, 0.08);
+}
+
+/* ===== 青碧 ===== */
+[data-theme-color="teal"] {
+  --primary: #5ac8fa;
+  --primary-hover: #7dd5fb;
+  --primary-active: #3db8e8;
+  --primary-light: rgba(90, 200, 250, 0.08);
+  --bg-sidebar: #0d1b2a;
+}

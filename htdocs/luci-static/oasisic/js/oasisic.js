@@ -12,13 +12,28 @@ var Oasisic = (function() {
     name: 'oasisic',
     sidebarCollapsed: false,
     darkMode: false,
+    colorPreset: 'blue',
   };
 
   function init() {
+    loadConfig();
     loadThemePreference();
     bindSidebarToggle();
     bindKeyboardShortcuts();
     updatePageTitle();
+  }
+
+  function loadConfig() {
+    // Read data-theme-color from HTML if set by server
+    var color = document.documentElement.getAttribute('data-theme-color');
+    if (color) {
+      theme.colorPreset = color;
+    }
+    // Read sidebar state from server-side data attribute
+    var sidebarState = document.documentElement.getAttribute('data-sidebar');
+    if (sidebarState === 'collapsed') {
+      theme.sidebarCollapsed = true;
+    }
   }
 
   function loadThemePreference() {
@@ -33,7 +48,6 @@ var Oasisic = (function() {
       document.documentElement.setAttribute('data-theme', 'light');
     }
 
-    // Listen for system changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
       if (!localStorage.getItem('oasisic-theme')) {
         theme.darkMode = e.matches;
@@ -69,12 +83,10 @@ var Oasisic = (function() {
 
   function bindKeyboardShortcuts() {
     document.addEventListener('keydown', function(e) {
-      // Ctrl+B or Cmd+B to toggle sidebar
       if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
         e.preventDefault();
         toggleSidebar();
       }
-      // T for theme toggle
       if (e.key === 't' && !e.ctrlKey && !e.metaKey && !e.target.matches('input, textarea')) {
         toggleTheme();
       }
@@ -82,7 +94,6 @@ var Oasisic = (function() {
   }
 
   function updatePageTitle() {
-    // Update the page title from the first h1/h2 if available
     var title = document.querySelector('h1, h2.oasisic-page-title');
     if (title) {
       document.title = title.textContent.trim() + ' - Oasisic';
@@ -95,7 +106,6 @@ var Oasisic = (function() {
     toast.className = 'oasisic-toast ' + type;
     toast.textContent = message;
     document.body.appendChild(toast);
-    // Trigger animation
     requestAnimationFrame(function() {
       toast.classList.add('show');
     });
@@ -105,11 +115,18 @@ var Oasisic = (function() {
     }, 3000);
   }
 
+  function setColorPreset(preset) {
+    theme.colorPreset = preset;
+    document.documentElement.setAttribute('data-theme-color', preset);
+    localStorage.setItem('oasisic-color', preset);
+  }
+
   return {
     init: init,
     toggleTheme: toggleTheme,
     toggleSidebar: toggleSidebar,
     showToast: showToast,
+    setColorPreset: setColorPreset,
     version: theme.version,
   };
 })();

@@ -50,8 +50,12 @@ define Package/$(PKG_NAME)/install
 	# Lua dispatcher
 	$(CP) ./luasrc/dispatcher/oasisic.lua $(1)/usr/lib/lua/luci/dispatcher/
 
-	# Lua controller (2FA)
+	# Lua controller (2FA + config)
 	$(CP) ./luasrc/controller/oasisic/* $(1)/usr/lib/lua/luci/controller/oasisic/
+
+	# Lua CBI model (config)
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi
+	$(CP) ./luasrc/model/cbi/* $(1)/usr/lib/lua/luci/model/cbi/
 
 	# ucode templates
 	$(CP) ./ucode/template/oasisic/* $(1)/usr/share/ucode/luci/template/oasisic/
