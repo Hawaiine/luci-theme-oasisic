@@ -32,6 +32,9 @@ define Package/$(PKG_NAME)/description
   $(LUCI_DESCRIPTION)
 endef
 
+define Build/Configure
+endef
+
 define Build/Compile
 endef
 
