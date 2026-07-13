@@ -15,64 +15,86 @@
 </head>
 <body class="oasisic-login-body">
 	<div class="oasisic-login-wrapper">
-		<!-- Background image will be set by login.js via Bing wallpaper API -->
 		<div class="oasisic-login-bg" id="loginBg"></div>
 		<div class="oasisic-login-overlay"></div>
 
-		<div class="oasisic-login-card">
-			<div class="oasisic-login-brand">
-				<div class="oasisic-login-logo">
-					<div class="oasisic-logo-diamond"></div>
-					<div class="oasisic-logo-dot"></div>
+		<div class="oasisic-login-card" id="loginCard">
+			<!-- 第一步：密码登录 -->
+			<div id="loginStep1">
+				<div class="oasisic-login-brand">
+					<div class="oasisic-login-logo">
+						<div class="oasisic-logo-diamond"></div>
+						<div class="oasisic-logo-dot"></div>
+					</div>
+					<span class="oasisic-login-brand-name">OASISIC</span>
 				</div>
-				<span class="oasisic-login-brand-name">OASISIC</span>
+
+				<h3 class="oasisic-login-title"><%=translate("Welcome back")%></h3>
+				<p class="oasisic-login-hint"><%=translate("Log in to manage your router")%></p>
+
+				<form method="post" action="<%=REQUEST_URI%>" class="oasisic-login-form" id="loginForm">
+					<div class="oasisic-login-field">
+						<input id="username" name="username" type="text" placeholder="<%=translate('Username')%>" autocomplete="username" required autofocus>
+					</div>
+					<div class="oasisic-login-field">
+						<input id="password" name="password" type="password" placeholder="<%=translate('Password')%>" autocomplete="current-password" required>
+					</div>
+
+					<div class="oasisic-login-options">
+						<label class="oasisic-login-remember">
+							<input type="checkbox" name="remember" id="remember" checked>
+							<span><%=translate("Remember me")%></span>
+						</label>
+						<% if luci.sys.call("which webauthn-token >/dev/null 2>&1") == 0 then %>
+						<button type="button" class="oasisic-login-passkey" onclick="OasisicLogin.passkeyAuth()">
+							<%=translate("Passkey")%>
+						</button>
+						<% end %>
+					</div>
+
+					<button type="submit" class="oasisic-login-btn"><%=translate("Login")%></button>
+
+					<div class="oasisic-login-footer">
+						<span>luci-theme-oasisic</span>
+						<span class="oasisic-login-ver">v1.0.0</span>
+					</div>
+				</form>
 			</div>
 
-			<h3 class="oasisic-login-title"><%=translate("Welcome back")%></h3>
-			<p class="oasisic-login-hint"><%=translate("Log in to manage your router")%></p>
-
-			<form method="post" action="<%=REQUEST_URI%>" class="oasisic-login-form">
-				<div class="oasisic-login-field">
-					<input id="username" name="username" type="text" placeholder="<%=translate('Username')%>" autocomplete="username" required autofocus>
-				</div>
-				<div class="oasisic-login-field">
-					<input id="password" name="password" type="password" placeholder="<%=translate('Password')%>" autocomplete="current-password" required>
-				</div>
-
-				<div class="oasisic-login-options">
-					<label class="oasisic-login-remember">
-						<input type="checkbox" name="remember" id="remember" checked>
-						<span><%=translate("Remember me")%></span>
-					</label>
-					<% if luci.sys.call("which webauthn-token >/dev/null 2>&1") == 0 then %>
-					<button type="button" class="oasisic-login-passkey" onclick="OasisicLogin.passkeyAuth()">
-						<%=translate("Passkey")%>
-					</button>
-					<% end %>
+			<!-- 第二步：TOTP 验证（隐藏，2FA 启用时显示） -->
+			<div id="loginStep2" style="display:none;">
+				<div class="oasisic-login-brand">
+					<div class="oasisic-login-logo">
+						<div class="oasisic-logo-diamond"></div>
+						<div class="oasisic-logo-dot"></div>
+					</div>
+					<span class="oasisic-login-brand-name">OASISIC</span>
 				</div>
 
-				<button type="submit" class="oasisic-login-btn"><%=translate("Login")%></button>
+				<h3 class="oasisic-login-title">🔐 <%=translate("Two-factor authentication")%></h3>
+				<p class="oasisic-login-hint"><%=translate("Enter the 6-digit code from your authenticator app")%></p>
 
-				<% if luci.sys.call("which oath-totp >/dev/null 2>&1") == 0 then %>
-				<button type="button" class="oasisic-login-2fa" onclick="OasisicLogin.show2FA()">
-					<%=translate("Two-factor authentication")%>
-				</button>
-				<% end %>
-
-				<div class="oasisic-login-footer">
-					<span>luci-theme-oasisic</span>
-					<span class="oasisic-login-ver">v1.0.0</span>
+				<div class="oasisic-login-form">
+					<div class="oasisic-login-field">
+						<input id="totp-code" type="text" placeholder="<%=translate('6-digit code')%>" maxlength="6" autocomplete="one-time-code" style="text-align:center;font-size:22px;letter-spacing:6px;font-family:var(--font-mono);padding:14px;">
+					</div>
+					<div id="totp-error" class="oasisic-login-error" style="display:none;"></div>
+					<button class="oasisic-login-btn" onclick="OasisicLogin.verifyTOTP()" id="totp-verify-btn"><%=translate("Verify")%></button>
+					<button class="oasisic-login-2fa" onclick="OasisicLogin.backToLogin()"><%=translate("Back to login")%></button>
 				</div>
-			</form>
-
-			<div class="oasisic-login-wallpaper-credit">
-				<%=translate("Bing daily wallpaper")%> · 6h
 			</div>
+		</div>
+
+		<div class="oasisic-login-wallpaper-credit">
+			<%=translate("Bing daily wallpaper")%> · 6h
 		</div>
 	</div>
 
 	<script>
-		OasisicLogin.init();
+		OasisicLogin.init({
+			totpEnabled: <%= luci.sys.call("test -f /etc/oasisic/totp_enabled && cat /etc/oasisic/totp_enabled") == 0 and "true" or "false" %>,
+			totpAvailable: <%= luci.sys.call("command -v oathtool >/dev/null 2>&1") == 0 and "true" or "false" %>
+		});
 	</script>
 </body>
 </html>

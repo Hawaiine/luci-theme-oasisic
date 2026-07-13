@@ -38,6 +38,7 @@ endef
 define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/www/luci-static/oasisic
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/oasisic
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller/oasisic
 	$(INSTALL_DIR) $(1)/usr/share/ucode/luci/template/oasisic
 
 	# Static assets
@@ -48,6 +49,9 @@ define Package/$(PKG_NAME)/install
 
 	# Lua dispatcher
 	$(CP) ./luasrc/dispatcher/oasisic.lua $(1)/usr/lib/lua/luci/dispatcher/
+
+	# Lua controller (2FA)
+	$(CP) ./luasrc/controller/oasisic/* $(1)/usr/lib/lua/luci/controller/oasisic/
 
 	# ucode templates
 	$(CP) ./ucode/template/oasisic/* $(1)/usr/share/ucode/luci/template/oasisic/
