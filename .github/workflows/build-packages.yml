@@ -110,24 +110,18 @@ jobs:
           echo "CONFIG_PACKAGE_luci=y" >> .config
           make defconfig
 
-      - name: 编译主题和 Nikki 包
+      - name: 编译主题包
         run: |
           cd openwrt
-          # 先编译工具链
-          make tools/install -j$(nproc)
-          make toolchain/install -j$(nproc)
-          # 编译目标包
+          # 工具链如果未缓存则编译
+          make tools/install -j$(nproc) 2>/dev/null || true
+          make toolchain/install -j$(nproc) 2>/dev/null || true
           make package/luci-theme-oasisic/compile -j$(nproc) V=s
-          make package/OpenWrt-nikki/compile -j$(nproc) V=s
 
       - name: 收集编译产物
         run: |
           mkdir -p artifacts
-          find openwrt/bin/ -name 'luci-theme-oasisic*.ipk' -o -name 'luci-theme-oasisic*.apk' 2>/dev/null | head -5 | while read f; do
-            cp "$f" artifacts/
-            echo "  📦 $(basename $f)" >> artifacts/manifest.txt
-          done
-          find openwrt/bin/ -name 'luci-app-nikki*.ipk' -o -name 'luci-app-nikki*.apk' 2>/dev/null | head -5 | while read f; do
+          find openwrt/bin/ -name 'luci-theme-oasisic*.ipk' -o -name 'luci-theme-oasisic*.apk' 2>/dev/null | while read f; do
             cp "$f" artifacts/
             echo "  📦 $(basename $f)" >> artifacts/manifest.txt
           done
@@ -135,7 +129,6 @@ jobs:
           echo "OpenWrt: ${{ github.event.inputs.openwrt_branch }}" >> artifacts/manifest.txt
           echo "Arch: ${{ github.event.inputs.arch }}" >> artifacts/manifest.txt
           echo "Theme: $(cd luci-theme-oasisic && git describe --tags 2>/dev/null || echo 'dev')" >> artifacts/manifest.txt
-          echo "Nikki: $(cd OpenWrt-nikki && git describe --tags 2>/dev/null || echo 'latest')" >> artifacts/manifest.txt
           cat artifacts/manifest.txt
 
       - name: 上传构建产物
