@@ -30,12 +30,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 检出主题源码
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: luci-theme-oasisic
 
       - name: 检出 Nikki 最新版
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: nikkinikki-org/OpenWrt-nikki
           path: OpenWrt-nikki
@@ -132,7 +132,7 @@ jobs:
           cat artifacts/manifest.txt
 
       - name: 上传构建产物
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: oasisic-${{ github.event.inputs.arch }}-${{ github.event.inputs.openwrt_branch }}
           path: artifacts/
