@@ -84,7 +84,26 @@
 .oasisic-topo-note { font-size: 10px; color: var(--text-secondary); margin-top: 6px; }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .oasisic-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
+  .oasisic-sidebar {
+    width: 56px;
+  }
+  .oasisic-sidebar .oasisic-sidebar-name,
+  .oasisic-sidebar .oasisic-sidebar-tag,
+  .oasisic-sidebar .oasisic-nav-label,
+  .oasisic-sidebar .oasisic-nav-section,
+  .oasisic-sidebar-footer {
+    display: none;
+  }
+  .oasisic-main {
+    margin-left: 56px;
+  }
   .oasisic-status-bar {
     flex-wrap: wrap;
   }
@@ -96,5 +115,14 @@
   }
   .oasisic-gauge-row {
     flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .oasisic-main {
+    padding: 12px;
+  }
+  .oasisic-status-item {
+    min-width: 100%;
   }
 }

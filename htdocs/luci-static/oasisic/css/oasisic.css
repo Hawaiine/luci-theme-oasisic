@@ -598,13 +598,224 @@ body {
 .oasisic-toast.error { background: #ff453a; }
 .oasisic-toast.info { background: var(--primary); }
 
-/* ===== Fix LuCI default overrides ===== */
-.cbi-input-text, .cbi-input-password { @extend .oasisic-input; }
+/* ===== LuCI 标准组件覆盖 ===== */
 
-/* Reduce LuCI default spacing clutter */
-div.cbi-value { margin-bottom: 6px; }
-.cbi-value-title { font-size: 12px; color: var(--text-secondary); }
-.cbi-value-field { margin-top: 4px; }
+/* CBI 表单 */
+.cbi-input-text, .cbi-input-password,
+.cbi-input-select, .cbi-input-file {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 0.5px solid var(--border-medium);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.cbi-input-text:focus, .cbi-input-password:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+}
 
-/* Remove LuCI borders in favor of shadow-border */
+/* CBI 值布局 */
+div.cbi-value { margin-bottom: 8px; padding: 6px 0; }
+.cbi-value-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 0 0 2px;
+  display: block;
+}
+.cbi-value-field { margin-top: 2px; }
+.cbi-value-description {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+
+/* CBI 段 */
+.cbi-section {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  border: 0.5px solid var(--border-light);
+  margin-bottom: var(--space-md);
+  box-shadow: var(--shadow-sm);
+}
+.cbi-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 0.5px solid var(--border-light);
+  color: var(--text-primary);
+}
+
+/* 去除 LuCI 默认边框 */
 .node, .section { border: none; background: none; box-shadow: none; }
+
+/* Tab 导航 */
+.cbi-tabcontainer {
+  margin-bottom: var(--space-md);
+}
+.cbi-tabmenu {
+  display: flex;
+  gap: 0;
+  border-bottom: 0.5px solid var(--border-light);
+  margin-bottom: var(--space-md);
+  padding: 0;
+  list-style: none;
+}
+.cbi-tabmenu li {
+  margin: 0;
+}
+.cbi-tabmenu li a {
+  display: block;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  margin-bottom: -0.5px;
+}
+.cbi-tabmenu li a:hover {
+  color: var(--text-primary);
+}
+.cbi-tabmenu li a[style*="font-weight:bold"],
+.cbi-tabmenu li.active a {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600 !important;
+}
+
+/* 表格 */
+table, .cbi-section-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+table th, .cbi-section-table th {
+  text-align: left;
+  padding: 8px 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  border-bottom: 0.5px solid var(--border-light);
+  font-size: 11px;
+  background: transparent;
+}
+table td, .cbi-section-table td {
+  padding: 8px 12px;
+  border-bottom: 0.5px solid var(--border-light);
+  color: var(--text-primary);
+}
+table tr:hover td,
+.cbi-section-table tr:hover td {
+  background: rgba(0, 0, 0, 0.01);
+}
+
+/* 按钮覆盖 */
+.cbi-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  line-height: 1.3;
+}
+.cbi-button-apply, .cbi-button-save {
+  background: var(--primary);
+  color: #fff;
+}
+.cbi-button-apply:hover, .cbi-button-save:hover {
+  background: var(--primary-hover);
+}
+.cbi-button-reset, .cbi-button-cancel {
+  background: transparent;
+  color: var(--text-primary);
+  border: 0.5px solid var(--border-medium);
+}
+.cbi-button-reset:hover, .cbi-button-cancel:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+.cbi-button-remove, .cbi-button-delete {
+  background: #ff453a;
+  color: #fff;
+}
+.cbi-button-add {
+  background: rgba(0, 113, 227, 0.08);
+  color: var(--primary);
+  font-size: 12px;
+}
+
+/* 弹窗/对话框 */
+.cbi-modal {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 0.5px solid var(--border-light);
+  padding: var(--space-xl);
+  max-width: 500px;
+}
+
+/* 通知/警告 */
+.alert-message, .alert-info, .cbi-tips {
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 12px;
+  margin-bottom: var(--space-md);
+  border: none;
+}
+.alert-message { background: rgba(0, 113, 227, 0.06); color: var(--primary); }
+.alert-info { background: rgba(48, 209, 88, 0.06); color: #30d158; }
+.alert-danger, .errorbox { background: rgba(255, 69, 58, 0.06); color: #ff453a; }
+.alert-warning { background: rgba(255, 159, 10, 0.06); color: #ff9f0a; }
+
+/* 进度条 */
+.cbi-progressbar {
+  height: 6px;
+  background: var(--border-light);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.cbi-progressbar-value {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+/* 选择框 */
+.cbi-input-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2386868b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+
+/* 复选框/单选框 */
+.cbi-input-radio, .cbi-input-checkbox {
+  accent-color: var(--primary);
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+/* 页脚版权 */
+.footer {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: var(--space-lg) 0;
+}

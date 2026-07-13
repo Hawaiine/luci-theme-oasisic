@@ -1,0 +1,232 @@
+/*!
+ * luci-theme-oasisic — Nikki 插件页面适配
+ * v1.0.0
+ */
+
+/* ===== Nikki 状态概览卡片 ===== */
+.nikki-status-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  border: 0.5px solid var(--border-light);
+  margin-bottom: var(--space-md);
+}
+
+.nikki-status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.nikki-status-title {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nikki-status-badge {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.nikki-status-badge.running {
+  background: var(--primary);
+  color: #fff;
+}
+
+.nikki-status-badge.stopped {
+  background: #ff453a;
+  color: #fff;
+}
+
+/* ===== Nikki 模式切换按钮 ===== */
+.nikki-mode-group {
+  display: flex;
+  gap: 6px;
+  margin-bottom: var(--space-md);
+}
+
+.nikki-mode-btn {
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border-medium);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.nikki-mode-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.nikki-mode-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* ===== Nikki 节点列表 ===== */
+.nikki-node-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 0.5px solid var(--border-light);
+  margin-bottom: 6px;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+
+.nikki-node-item:hover {
+  background: rgba(0, 113, 227, 0.03);
+}
+
+.nikki-node-item.active {
+  border-color: rgba(0, 113, 227, 0.2);
+  background: rgba(0, 113, 227, 0.04);
+}
+
+.nikki-node-flag {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.nikki-node-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.nikki-node-latency {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+  background: var(--bg-body);
+  border-radius: 4px;
+}
+
+.nikki-node-latency.good { color: #30d158; }
+.nikki-node-latency.fair { color: #ff9f0a; }
+.nikki-node-latency.bad { color: #ff453a; }
+
+/* ===== Nikki 规则列表 ===== */
+.nikki-rule-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  border-bottom: 0.5px solid var(--border-light);
+}
+
+.nikki-rule-type {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.nikki-rule-type.domain { background: rgba(0, 113, 227, 0.08); color: var(--primary); }
+.nikki-rule-type.ip { background: rgba(48, 209, 88, 0.08); color: #30d158; }
+.nikki-rule-type.geoip { background: rgba(255, 159, 10, 0.08); color: #ff9f0a; }
+.nikki-rule-type.final { background: rgba(255, 69, 58, 0.08); color: #ff453a; }
+
+.nikki-rule-content {
+  flex: 1;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.nikki-rule-target {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+/* ===== Nikki 日志 ===== */
+.nikki-log-container {
+  background: #1d1d1f;
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  max-height: 400px;
+  overflow-y: auto;
+  color: #f5f5f7;
+}
+
+.nikki-log-line {
+  padding: 2px 0;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.03);
+}
+
+.nikki-log-line .time {
+  color: rgba(255, 255, 255, 0.3);
+  margin-right: 8px;
+}
+
+.nikki-log-line .level {
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.nikki-log-line .level.info { color: #40b4ff; }
+.nikki-log-line .level.warn { color: #ff9f0a; }
+.nikki-log-line .level.error { color: #ff453a; }
+
+/* ===== Nikki 流量统计 ===== */
+.nikki-traffic-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: var(--space-md);
+}
+
+.nikki-traffic-item {
+  background: var(--bg-body);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  text-align: center;
+}
+
+.nikki-traffic-value {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.nikki-traffic-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ===== Nikki 页面通用 ===== */
+.cbi-section h3:has(.nikki-) {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
