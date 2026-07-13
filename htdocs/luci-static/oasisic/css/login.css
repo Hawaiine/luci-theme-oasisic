@@ -1,0 +1,271 @@
+/*!
+ * luci-theme-oasisic — Login page
+ * v1.0.0
+ */
+
+/* ===== Login body ===== */
+.oasisic-login-body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  height: 100vh;
+  background: #000;
+}
+
+/* ===== Wrapper ===== */
+.oasisic-login-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== Background ===== */
+.oasisic-login-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: background-image 1s ease;
+}
+
+.oasisic-login-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.30) 100%);
+}
+
+/* ===== Login Card ===== */
+.oasisic-login-card {
+  position: relative;
+  width: 376px;
+  max-width: 90vw;
+  background: rgba(15, 15, 20, 0.55);
+  backdrop-filter: blur(80px) saturate(1.2);
+  -webkit-backdrop-filter: blur(80px) saturate(1.2);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 40px 32px 32px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.30);
+  z-index: 1;
+}
+
+/* ===== Brand ===== */
+.oasisic-login-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.oasisic-login-logo {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.oasisic-logo-diamond {
+  width: 30px;
+  height: 30px;
+  background: #0071e3;
+  border-radius: 6px;
+  transform: rotate(45deg) scale(0.75);
+  position: absolute;
+  top: 4px;
+  left: 4px;
+}
+
+.oasisic-logo-dot {
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+}
+
+.oasisic-login-brand-name {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+/* ===== Title ===== */
+.oasisic-login-title {
+  color: #fff;
+  font-size: 21px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
+  line-height: 1.15;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+}
+
+.oasisic-login-hint {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 14px;
+  margin-bottom: 28px;
+  letter-spacing: -0.1px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Form ===== */
+.oasisic-login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.oasisic-login-field {
+  margin-bottom: 10px;
+}
+
+.oasisic-login-field input {
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  letter-spacing: -0.1px;
+}
+
+.oasisic-login-field input::placeholder {
+  color: rgba(255, 255, 255, 0.30);
+}
+
+.oasisic-login-field input:focus {
+  border-color: rgba(0, 113, 227, 0.5);
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+}
+
+/* ===== Options ===== */
+.oasisic-login-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.oasisic-login-remember {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  letter-spacing: -0.1px;
+}
+
+.oasisic-login-remember input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #0071e3;
+  border-radius: 3px;
+}
+
+/* ===== Passkey ===== */
+.oasisic-login-passkey {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+  border-radius: 30px;
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  letter-spacing: -0.1px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.oasisic-login-passkey:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.12));
+}
+
+/* ===== Buttons ===== */
+.oasisic-login-btn {
+  width: 100%;
+  padding: 13px;
+  border-radius: 10px;
+  border: none;
+  background: #0071e3;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.1px;
+  transition: background 0.2s;
+}
+
+.oasisic-login-btn:hover { background: #0077ed; }
+.oasisic-login-btn:active { background: #006edb; }
+
+.oasisic-login-2fa {
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.30);
+  font-size: 12px;
+  font-weight: 400;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 4px;
+}
+
+.oasisic-login-2fa:hover { color: rgba(255, 255, 255, 0.45); }
+
+/* ===== Footer ===== */
+.oasisic-login-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 28px;
+  color: rgba(255, 255, 255, 0.12);
+  font-size: 10px;
+  letter-spacing: 0.2px;
+}
+
+.oasisic-login-ver {
+  color: rgba(255, 255, 255, 0.08);
+  font-weight: 500;
+}
+
+/* ===== Wallpaper credit ===== */
+.oasisic-login-wallpaper-credit {
+  position: absolute;
+  bottom: -32px;
+  right: 0;
+  color: rgba(255, 255, 255, 0.10);
+  font-size: 9px;
+}
+
+/* ===== Shake animation ===== */
+@keyframes oasisic-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 50%, 90% { transform: translateX(-4px); }
+  30%, 70% { transform: translateX(4px); }
+}
+
+.oasisic-login-card.shake {
+  animation: oasisic-shake 0.5s ease-in-out;
+}

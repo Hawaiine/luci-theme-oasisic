@@ -1,0 +1,610 @@
+/*!
+ * luci-theme-oasisic v1.0.0
+ * Oasisic OpenWrt — Apple-inspired LuCI theme
+ * Licensed under Apache 2.0
+ */
+
+/* ===== CSS Custom Properties ===== */
+:root {
+  /* Apple Blue palette */
+  --primary: #0071e3;
+  --primary-hover: #0077ed;
+  --primary-active: #006edb;
+  --primary-light: rgba(0, 113, 227, 0.08);
+
+  /* Surfaces */
+  --bg-body: #f5f5f7;
+  --bg-card: #ffffff;
+  --bg-sidebar: #1d1d1f;
+  --bg-input: #ffffff;
+
+  /* Text */
+  --text-primary: #1d1d1f;
+  --text-secondary: #86868b;
+  --text-tertiary: #c7c7cc;
+  --text-inverse: #ffffff;
+
+  /* Borders */
+  --border-light: rgba(0, 0, 0, 0.04);
+  --border-medium: rgba(0, 0, 0, 0.08);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.08);
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+
+  /* Typography */
+  --font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-size-sm: 11px;
+  --font-size-base: 13px;
+  --font-size-lg: 15px;
+  --font-size-xl: 20px;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+
+  /* Layout */
+  --sidebar-width: 220px;
+  --sidebar-collapsed-width: 56px;
+  --header-height: 52px;
+}
+
+/* ===== Reset & Base ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: var(--font-size-base);
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--bg-body);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== Layout ===== */
+.oasisic-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== Sidebar ===== */
+.oasisic-sidebar {
+  width: var(--sidebar-width);
+  background: var(--bg-sidebar);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 100;
+  transition: width 0.25s ease;
+  overflow: hidden;
+}
+
+.oasisic-sidebar.collapsed {
+  width: var(--sidebar-collapsed-width);
+}
+
+.oasisic-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px 0;
+  margin-bottom: 20px;
+}
+
+.oasisic-sidebar-logo {
+  width: 26px;
+  height: 26px;
+  background: var(--primary);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 600;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.oasisic-sidebar-name {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.oasisic-sidebar.collapsed .oasisic-sidebar-name { display: none; }
+
+.oasisic-sidebar-tag {
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 9px;
+  margin-left: auto;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: rgba(0, 113, 227, 0.12);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.oasisic-sidebar.collapsed .oasisic-sidebar-tag { display: none; }
+
+/* Navigation sections */
+.oasisic-nav-section {
+  padding: 12px 20px 4px;
+  color: rgba(255, 255, 255, 0.18);
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.oasisic-sidebar.collapsed .oasisic-nav-section { display: none; }
+
+.oasisic-nav-item {
+  padding: 9px 20px;
+  color: rgba(255, 255, 255, 0.40);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.oasisic-nav-item:hover {
+  color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.oasisic-nav-item.active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.oasisic-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 18px;
+  border-radius: 0 2px 2px 0;
+  background: var(--primary);
+}
+
+.oasisic-nav-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.oasisic-sidebar.collapsed .oasisic-nav-label { display: none; }
+
+.oasisic-sidebar-spacer { flex: 1; }
+
+.oasisic-sidebar-footer {
+  padding: 14px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.oasisic-sidebar.collapsed .oasisic-sidebar-footer { display: none; }
+
+.oasisic-sidebar-footer-text {
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* ===== Main Content ===== */
+.oasisic-main {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  padding: var(--space-xl);
+  transition: margin-left 0.25s ease;
+  min-height: 100vh;
+}
+
+.oasisic-sidebar.collapsed ~ .oasisic-main {
+  margin-left: var(--sidebar-collapsed-width);
+}
+
+/* Header */
+.oasisic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+}
+
+.oasisic-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.oasisic-sidebar-toggle {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0;
+}
+
+.oasisic-sidebar-toggle span {
+  display: block;
+  width: 16px;
+  height: 1.5px;
+  background: var(--text-secondary);
+  border-radius: 1px;
+  transition: all 0.2s;
+}
+
+.oasisic-page-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+}
+
+.oasisic-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.oasisic-version {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+/* Content area */
+.oasisic-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* ===== Cards ===== */
+.oasisic-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  border: 0.5px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.oasisic-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+  letter-spacing: -0.1px;
+}
+
+/* ===== Status Bar ===== */
+.oasisic-status-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: var(--space-lg);
+}
+
+.oasisic-status-item {
+  flex: 1;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 11px 14px;
+  border: 0.5px solid var(--border-light);
+}
+
+.oasisic-status-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-bottom: 3px;
+}
+
+.oasisic-status-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.oasisic-status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.oasisic-status-dot.green { background: #30d158; }
+.oasisic-status-dot.orange { background: #ff9f0a; }
+.oasisic-status-dot.red { background: #ff453a; }
+
+/* ===== Gauges ===== */
+.oasisic-gauge-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: var(--space-lg);
+}
+
+.oasisic-gauge-card {
+  flex: 1;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  border: 0.5px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.oasisic-gauge-ring {
+  width: 44px;
+  height: 44px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.oasisic-gauge-ring svg { transform: rotate(-90deg); }
+
+.oasisic-gauge-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.oasisic-gauge-label { font-size: 10px; color: var(--text-secondary); }
+.oasisic-gauge-detail { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+
+/* ===== Cards Grid ===== */
+.oasisic-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* Info rows inside cards */
+.oasisic-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+  font-size: 12px;
+}
+
+.oasisic-info-label { color: var(--text-secondary); }
+.oasisic-info-value { color: var(--text-primary); font-weight: 500; }
+.oasisic-info-value.green { color: #30d158; }
+.oasisic-info-value.blue { color: var(--primary); }
+.oasisic-info-value.orange { color: #ff9f0a; }
+
+/* Nikki card */
+.oasisic-card-nikki {
+  border-color: rgba(0, 113, 227, 0.12);
+  background: linear-gradient(135deg, rgba(0, 113, 227, 0.02), transparent);
+  position: relative;
+}
+
+.oasisic-card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 8px;
+  font-weight: 600;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+
+.oasisic-card-badge.blue { background: var(--primary); }
+.oasisic-card-badge.green { background: #30d158; }
+
+/* ===== Charts ===== */
+.oasisic-chart-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  border: 0.5px solid var(--border-light);
+}
+
+.oasisic-chart-title {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.oasisic-chart-vis {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 44px;
+}
+
+.oasisic-chart-bar {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  min-height: 3px;
+}
+
+.oasisic-chart-bar.down { background: linear-gradient(to top, var(--primary), #40b4ff); opacity: 0.7; }
+.oasisic-chart-bar.up { background: linear-gradient(to top, #30d158, #63e6a0); opacity: 0.5; }
+
+/* ===== Forms ===== */
+.oasisic-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 0.5px solid var(--border-medium);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.oasisic-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+}
+
+/* ===== Tables ===== */
+.oasisic-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.oasisic-table th {
+  text-align: left;
+  padding: 8px 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  border-bottom: 0.5px solid var(--border-light);
+  font-size: 11px;
+}
+
+.oasisic-table td {
+  padding: 8px 12px;
+  border-bottom: 0.5px solid var(--border-light);
+}
+
+.oasisic-table tr:hover td { background: rgba(0, 0, 0, 0.01); }
+
+/* ===== Toggle/Switch ===== */
+.oasisic-toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.oasisic-toggle input { opacity: 0; width: 0; height: 0; }
+
+.oasisic-toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #e8e8ed;
+  border-radius: 22px;
+  transition: background 0.2s;
+}
+
+.oasisic-toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.oasisic-toggle input:checked + .oasisic-toggle-slider { background: var(--primary); }
+.oasisic-toggle input:checked + .oasisic-toggle-slider::before { transform: translateX(14px); }
+
+/* ===== Buttons ===== */
+.oasisic-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.oasisic-btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.oasisic-btn-primary:hover { background: var(--primary-hover); }
+
+.oasisic-btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 0.5px solid var(--border-medium);
+}
+
+.oasisic-btn-secondary:hover { background: rgba(0, 0, 0, 0.02); }
+
+/* ===== Notifications ===== */
+.oasisic-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 1000;
+}
+
+.oasisic-toast.show { opacity: 1; transform: translateY(0); }
+.oasisic-toast.success { background: #30d158; }
+.oasisic-toast.error { background: #ff453a; }
+.oasisic-toast.info { background: var(--primary); }
+
+/* ===== Fix LuCI default overrides ===== */
+.cbi-input-text, .cbi-input-password { @extend .oasisic-input; }
+
+/* Reduce LuCI default spacing clutter */
+div.cbi-value { margin-bottom: 6px; }
+.cbi-value-title { font-size: 12px; color: var(--text-secondary); }
+.cbi-value-field { margin-top: 4px; }
+
+/* Remove LuCI borders in favor of shadow-border */
+.node, .section { border: none; background: none; box-shadow: none; }

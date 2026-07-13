@@ -1,0 +1,28 @@
+{%
+	let ver = luci.dispatcher.oasisic.version();
+%}
+<!DOCTYPE html>
+<html lang="{{ luci.i18n.media_plain() }}" data-theme="{{ L.theme_mode() }}" data-version="{{ ver }}">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#1d1d1f">
+	<title>{{ striptags(luci.sys.hostname()) }} - Oasisic</title>
+	<link rel="stylesheet" href="{{ media }}/css/oasisic.css">
+	<link rel="stylesheet" href="{{ media }}/css/oasisic-dark.css" media="(prefers-color-scheme: dark)">
+	<link rel="icon" type="image/svg+xml" href="{{ media }}/img/logo.svg">
+	<script src="{{ media }}/js/oasisic.js"></script>
+</head>
+<body>
+	<div id="app" class="oasisic-layout">
+		<aside class="oasisic-sidebar">...</aside>
+		<main id="maincontent" class="oasisic-main">
+			<div class="oasisic-header">
+				<div class="oasisic-header-left">
+					<h2 class="oasisic-page-title">{{ translate("Dashboard") }}</h2>
+				</div>
+				<div class="oasisic-header-right">
+					<span class="oasisic-version">v{{ ver }}</span>
+				</div>
+			</div>
+			<div class="oasisic-content">

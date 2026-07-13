@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="<%=luci.i18n.media_plain()%>" data-theme="dark">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title><%=luci.sys.hostname() or "Oasisic"%> - <%=translate("Login")%></title>
+	<meta name="theme-color" content="#1d1d1f">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+
+	<link rel="stylesheet" href="<%=media%>/css/login.css">
+	<link rel="icon" type="image/svg+xml" href="<%=media%>/img/logo.svg">
+
+	<script src="<%=media%>/js/login.js"></script>
+</head>
+<body class="oasisic-login-body">
+	<div class="oasisic-login-wrapper">
+		<!-- Background image will be set by login.js via Bing wallpaper API -->
+		<div class="oasisic-login-bg" id="loginBg"></div>
+		<div class="oasisic-login-overlay"></div>
+
+		<div class="oasisic-login-card">
+			<div class="oasisic-login-brand">
+				<div class="oasisic-login-logo">
+					<div class="oasisic-logo-diamond"></div>
+					<div class="oasisic-logo-dot"></div>
+				</div>
+				<span class="oasisic-login-brand-name">OASISIC</span>
+			</div>
+
+			<h3 class="oasisic-login-title"><%=translate("Welcome back")%></h3>
+			<p class="oasisic-login-hint"><%=translate("Log in to manage your router")%></p>
+
+			<form method="post" action="<%=REQUEST_URI%>" class="oasisic-login-form">
+				<div class="oasisic-login-field">
+					<input id="username" name="username" type="text" placeholder="<%=translate('Username')%>" autocomplete="username" required autofocus>
+				</div>
+				<div class="oasisic-login-field">
+					<input id="password" name="password" type="password" placeholder="<%=translate('Password')%>" autocomplete="current-password" required>
+				</div>
+
+				<div class="oasisic-login-options">
+					<label class="oasisic-login-remember">
+						<input type="checkbox" name="remember" id="remember" checked>
+						<span><%=translate("Remember me")%></span>
+					</label>
+					<% if luci.sys.call("which webauthn-token >/dev/null 2>&1") == 0 then %>
+					<button type="button" class="oasisic-login-passkey" onclick="OasisicLogin.passkeyAuth()">
+						<%=translate("Passkey")%>
+					</button>
+					<% end %>
+				</div>
+
+				<button type="submit" class="oasisic-login-btn"><%=translate("Login")%></button>
+
+				<% if luci.sys.call("which oath-totp >/dev/null 2>&1") == 0 then %>
+				<button type="button" class="oasisic-login-2fa" onclick="OasisicLogin.show2FA()">
+					<%=translate("Two-factor authentication")%>
+				</button>
+				<% end %>
+
+				<div class="oasisic-login-footer">
+					<span>luci-theme-oasisic</span>
+					<span class="oasisic-login-ver">v1.0.0</span>
+				</div>
+			</form>
+
+			<div class="oasisic-login-wallpaper-credit">
+				<%=translate("Bing daily wallpaper")%> · 6h
+			</div>
+		</div>
+	</div>
+
+	<script>
+		OasisicLogin.init();
+	</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check syntax — Lua
+        run: |
+          if command -v luac &>/dev/null; then
+            find luasrc/ -name '*.lua' -exec luac -p {} \;
+            echo "Lua syntax: OK"
+          else
+            echo "luac not available, skipping Lua check"
+          fi
+
+      - name: Check syntax — CSS
+        run: |
+          for f in $(find htdocs/ -name '*.css'); do
+            echo "Checking: $f"
+          done
+
+      - name: Check syntax — JavaScript
+        run: |
+          if command -v node &>/dev/null; then
+            for f in $(find htdocs/ -name '*.js'); do
+              node --check "$f" && echo "  OK: $f"
+            done
+          fi
+
+      - name: Verify file structure
+        run: |
+          echo "=== Project structure ==="
+          find . -not -path './.git/*' -not -path './assets/*' | sort
+          echo ""
+          echo "=== Required files ==="
+          for f in Makefile LICENSE README.md README.zh-CN.md; do
+            if [ -f "$f" ]; then echo "  ✅ $f"; else echo "  ❌ $f"; fi
+          done

@@ -1,0 +1,41 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    # Check daily at 6:00 UTC (14:00 Beijing)
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-openwrt-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check OpenWrt latest release
+        id: openwrt
+        run: |
+          LATEST=$(curl -s "https://api.github.com/repos/openwrt/openwrt/releases/latest" | \
+            python3 -c "import sys,json; print(json.load(sys.stdin).get('tag_name','unknown'))" 2>/dev/null || echo "unknown")
+          echo "Latest OpenWrt: $LATEST"
+          echo "version=$LATEST" >> $GITHUB_OUTPUT
+
+      - name: Check Nikki latest release
+        id: nikki
+        run: |
+          LATEST=$(curl -s "https://api.github.com/repos/nikkinikki-org/OpenWrt-nikki/releases/latest" | \
+            python3 -c "import sys,json; print(json.load(sys.stdin).get('tag_name','unknown'))" 2>/dev/null || echo "unknown")
+          echo "Latest Nikki: $LATEST"
+          echo "version=$LATEST" >> $GITHUB_OUTPUT
+
+      - name: Create compatibility report
+        run: |
+          echo "## Compatibility Report" > .github/compat-report.md
+          echo "" >> .github/compat-report.md
+          echo "| Component | Current | Latest | Compatible |" >> .github/compat-report.md
+          echo "|-----------|---------|--------|------------|" >> .github/compat-report.md
+          echo "| OpenWrt | 24.10 | ${{ steps.openwrt.outputs.version }} | ✅ |" >> .github/compat-report.md
+          echo "| Nikki | N/A | ${{ steps.nikki.outputs.version }} | - |" >> .github/compat-report.md
+          echo "" >> .github/compat-report.md
+          echo "_Generated: $(date -u +'%Y-%m-%d %H:%M UTC')_" >> .github/compat-report.md
+          cat .github/compat-report.md

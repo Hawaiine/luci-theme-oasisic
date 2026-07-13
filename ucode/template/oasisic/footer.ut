@@ -1,0 +1,7 @@
+</div>
+		</main>
+	</div>
+	<script src="{{ media }}/js/dashboard.js"></script>
+	<script>Oasisic.init();</script>
+</body>
+</html>
