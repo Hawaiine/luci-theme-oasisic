@@ -25,9 +25,8 @@
 
 | 页面 | 预览 |
 |------|------|
-| **登录页** | ![登录页](assets/screenshots/login.png) |
-| **仪表盘** | ![仪表盘](assets/screenshots/dashboard.png) |
-| **侧栏** | ![侧栏](assets/screenshots/sidebar.png) |
+| **登录页** ⬇️ | ![登录页](assets/screenshots/login.png) |
+| **仪表盘** ⬇️ | ![仪表盘](assets/screenshots/dashboard.png) |
 
 > 截图将在首次发布后补充。
 

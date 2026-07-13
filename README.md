@@ -25,9 +25,8 @@
 
 | Page | Preview |
 |------|---------|
-| **Login** | ![Login](assets/screenshots/login.png) |
-| **Dashboard** | ![Dashboard](assets/screenshots/dashboard.png) |
-| **Sidebar** | ![Sidebar](assets/screenshots/sidebar.png) |
+| **登录页** ⬇️ | ![Login](assets/screenshots/login.png) |
+| **仪表盘** ⬇️ | ![Dashboard](assets/screenshots/dashboard.png) |
 
 > Screenshots will be added after first release.
 

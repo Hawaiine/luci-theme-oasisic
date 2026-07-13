@@ -8,7 +8,7 @@ include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=Oasisic — A modern, elegant LuCI theme
 LUCI_DESCRIPTION:=Apple-inspired minimal design with bypass gateway awareness, Nikki proxy status, daily Bing wallpapers, and full dark/light mode support.
-LUCI_DEPENDS:=+luci-base
+LUCI_DEPENDS:=+luci-base +oath-toolkit
 
 PKG_NAME:=luci-theme-oasisic
 PKG_VERSION:=1.0.0
