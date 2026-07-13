@@ -21,6 +21,7 @@ var Oasisic = (function() {
     bindSidebarToggle();
     bindKeyboardShortcuts();
     updatePageTitle();
+    registerSW();
   }
 
   function loadConfig() {
@@ -119,6 +120,19 @@ var Oasisic = (function() {
     theme.colorPreset = preset;
     document.documentElement.setAttribute('data-theme-color', preset);
     localStorage.setItem('oasisic-color', preset);
+  }
+
+  function registerSW() {
+    if ('serviceWorker' in navigator) {
+      var swUrl = '/luci-static/oasisic/sw.js';
+      // Only register if not already active
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        var hasSW = regs.some(function(r) { return r.active && r.active.scriptURL.indexOf('sw.js') > -1; });
+        if (!hasSW) {
+          navigator.serviceWorker.register(swUrl);
+        }
+      });
+    }
   }
 
   return {
