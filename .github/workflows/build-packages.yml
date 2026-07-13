@@ -1,0 +1,140 @@
+name: 编译测试包
+
+on:
+  workflow_dispatch:
+    inputs:
+      openwrt_branch:
+        description: 'OpenWrt 分支'
+        required: true
+        default: 'openwrt-24.10'
+        type: choice
+        options:
+          - main
+          - openwrt-24.10
+          - openwrt-23.05
+      arch:
+        description: '目标架构'
+        required: true
+        default: 'x86_64'
+        type: choice
+        options:
+          - x86_64
+          - aarch64_cortex-a53
+          - aarch64_cortex-a72
+          - mipsel_24kc
+          - arm_cortex-a7_neon-vfpv4
+          - arm_cortex-a9_vfpv3-d16
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出主题源码
+        uses: actions/checkout@v4
+        with:
+          path: luci-theme-oasisic
+
+      - name: 检出 Nikki 最新版
+        uses: actions/checkout@v4
+        with:
+          repository: nikkinikki-org/OpenWrt-nikki
+          path: OpenWrt-nikki
+
+      - name: 准备构建环境
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential gawk wget git diffstat \
+            unzip texinfo zstd libssl-dev flex bison python3 python3-pip \
+            file gcc-multilib g++-multilib rsync gettext
+          python3 -m pip install pyelftools
+
+      - name: 克隆 OpenWrt 源码
+        run: |
+          git clone --depth=1 -b ${{ github.event.inputs.openwrt_branch }} \
+            https://github.com/openwrt/openwrt.git openwrt
+
+      - name: 配置 feeds
+        run: |
+          cd openwrt
+          # 添加主题
+          ln -s $GITHUB_WORKSPACE/luci-theme-oasisic package/luci-theme-oasisic
+          # 添加 Nikki
+          ln -s $GITHUB_WORKSPACE/OpenWrt-nikki package/OpenWrt-nikki
+          # 更新 feeds
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: 配置 defconfig
+        run: |
+          cd openwrt
+          # 设置目标架构
+          ARCH="${{ github.event.inputs.arch }}"
+          case "$ARCH" in
+            x86_64)
+              echo "CONFIG_TARGET_x86=y" > .config
+              echo "CONFIG_TARGET_x86_64=y" >> .config
+              ;;
+            aarch64_cortex-a53)
+              echo "CONFIG_TARGET_sunxi=y" >> .config
+              echo "CONFIG_TARGET_sunxi_cortexa53=y" >> .config
+              ;;
+            aarch64_cortex-a72)
+              echo "CONFIG_TARGET_rockchip=y" >> .config
+              echo "CONFIG_TARGET_rockchip_armv8=y" >> .config
+              ;;
+            mipsel_24kc)
+              echo "CONFIG_TARGET_ramips=y" >> .config
+              echo "CONFIG_TARGET_ramips_mt7621=y" >> .config
+              ;;
+            arm_cortex-a7_neon-vfpv4)
+              echo "CONFIG_TARGET_bcm27xx=y" >> .config
+              echo "CONFIG_TARGET_bcm27xx_bcm2710=y" >> .config
+              ;;
+            arm_cortex-a9_vfpv3-d16)
+              echo "CONFIG_TARGET_omap=y" >> .config
+              ;;
+          esac
+          # 选中主题
+          echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
+          # 选中 Nikki
+          echo "CONFIG_PACKAGE_luci-app-nikki=y" >> .config
+          # 选中依赖
+          echo "CONFIG_PACKAGE_luci-base=y" >> .config
+          echo "CONFIG_PACKAGE_oath-toolkit=y" >> .config
+          # 选中 luci
+          echo "CONFIG_PACKAGE_luci=y" >> .config
+          make defconfig
+
+      - name: 编译主题和 Nikki 包
+        run: |
+          cd openwrt
+          # 先编译工具链
+          make tools/install -j$(nproc)
+          make toolchain/install -j$(nproc)
+          # 编译目标包
+          make package/luci-theme-oasisic/compile -j$(nproc) V=s
+          make package/OpenWrt-nikki/compile -j$(nproc) V=s
+
+      - name: 收集编译产物
+        run: |
+          mkdir -p artifacts
+          find openwrt/bin/ -name 'luci-theme-oasisic*.ipk' -o -name 'luci-theme-oasisic*.apk' 2>/dev/null | head -5 | while read f; do
+            cp "$f" artifacts/
+            echo "  📦 $(basename $f)" >> artifacts/manifest.txt
+          done
+          find openwrt/bin/ -name 'luci-app-nikki*.ipk' -o -name 'luci-app-nikki*.apk' 2>/dev/null | head -5 | while read f; do
+            cp "$f" artifacts/
+            echo "  📦 $(basename $f)" >> artifacts/manifest.txt
+          done
+          # 记录版本信息
+          echo "OpenWrt: ${{ github.event.inputs.openwrt_branch }}" >> artifacts/manifest.txt
+          echo "Arch: ${{ github.event.inputs.arch }}" >> artifacts/manifest.txt
+          echo "Theme: $(cd luci-theme-oasisic && git describe --tags 2>/dev/null || echo 'dev')" >> artifacts/manifest.txt
+          echo "Nikki: $(cd OpenWrt-nikki && git describe --tags 2>/dev/null || echo 'latest')" >> artifacts/manifest.txt
+          cat artifacts/manifest.txt
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasisic-${{ github.event.inputs.arch }}-${{ github.event.inputs.openwrt_branch }}
+          path: artifacts/
