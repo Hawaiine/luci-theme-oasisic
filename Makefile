@@ -41,6 +41,7 @@ endef
 define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/www/luci-static/oasisic
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/oasisic
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/dispatcher
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller/oasisic
 	$(INSTALL_DIR) $(1)/usr/share/ucode/luci/template/oasisic
 
