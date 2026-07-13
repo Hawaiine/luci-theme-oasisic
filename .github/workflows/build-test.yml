@@ -13,35 +13,40 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install linters
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lua5.1 stylelint
+
       - name: Check syntax — Lua
         run: |
-          if command -v luac &>/dev/null; then
-            find luasrc/ -name '*.lua' -exec luac -p {} \;
-            echo "Lua syntax: OK"
-          else
-            echo "luac not available, skipping Lua check"
-          fi
-
-      - name: Check syntax — CSS
-        run: |
-          for f in $(find htdocs/ -name '*.css'); do
-            echo "Checking: $f"
+          ERR=0
+          for f in $(find luasrc/ -name '*.lua'); do
+            luac -p "$f" && echo "  ✅ $f" || { echo "  ❌ $f"; ERR=1; }
           done
+          [ "$ERR" -eq 0 ] || exit 1
 
       - name: Check syntax — JavaScript
         run: |
-          if command -v node &>/dev/null; then
-            for f in $(find htdocs/ -name '*.js'); do
-              node --check "$f" && echo "  OK: $f"
-            done
+          ERR=0
+          for f in $(find htdocs/ -name '*.js'); do
+            node --check "$f" && echo "  ✅ $(basename $f)" || { echo "  ❌ $(basename $f)"; ERR=1; }
+          done
+          [ "$ERR" -eq 0 ] || exit 1
+
+      - name: Check syntax — CSS
+        run: |
+          if command -v stylelint &>/dev/null; then
+            stylelint htdocs/luci-static/oasisic/css/*.css --config='{"rules":{"block-no-empty":true,"color-no-invalid-hex":true,"declaration-block-no-duplicate-properties":true}}' 2>&1 || true
           fi
+          echo "✅ CSS files scanned"
 
       - name: Verify file structure
         run: |
-          echo "=== Project structure ==="
-          find . -not -path './.git/*' -not -path './assets/*' | sort
+          echo "=== 文件结构 ==="
+          find . -not -path './.git/*' -not -path './assets/*' -type f | sort
           echo ""
-          echo "=== Required files ==="
+          echo "=== 必要文件检查 ==="
           for f in Makefile LICENSE README.md README.zh-CN.md; do
             if [ -f "$f" ]; then echo "  ✅ $f"; else echo "  ❌ $f"; fi
           done

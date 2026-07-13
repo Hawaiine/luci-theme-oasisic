@@ -7,22 +7,27 @@ module("luci.controller.oasisic.totp", package.seeall)
 
 local http = require("luci.http")
 local sauth = require("luci.sauth")
-local i18n = require("luci.i18n")
 local sys = require("luci.sys")
-local uci = require("luci.model.uci").cursor()
+local json = require("luci.json")
+local io = require("io")
+local os = require("os")
 
 -- TOTP 密钥存储路径
 local TOTP_SECRET_FILE = "/etc/oasisic/totp_secret"
 local TOTP_ENABLED_FILE = "/etc/oasisic/totp_enabled"
+-- 待二次验证票据目录
+local PENDING_AUTH_DIR = "/tmp/oasisic-pending/"
 
 function index()
 	entry({"admin", "system", "oasisic-2fa"}, alias("admin", "system", "oasisic-2fa", "setup"), _("两步验证"), 90).dependent = false
 	entry({"admin", "system", "oasisic-2fa", "setup"}, template("oasisic/totp_setup"), _("2FA 设置"), 1).dependent = false
-	entry({"admin", "system", "oasisic-2fa", "verify"}, post("verify_totp"), nil).dependent = false
 	entry({"admin", "system", "oasisic-2fa", "status"}, call("ajax_status"), nil).dependent = false
 	entry({"admin", "system", "oasisic-2fa", "generate"}, post("ajax_generate"), nil).dependent = false
 	entry({"admin", "system", "oasisic-2fa", "enable"}, post("ajax_enable"), nil).dependent = false
 	entry({"admin", "system", "oasisic-2fa", "disable"}, post("ajax_disable"), nil).dependent = false
+	-- 登录相关路由
+	entry({"admin", "system", "oasisic-2fa", "login_check"}, post("ajax_login_check"), nil).dependent = false
+	entry({"admin", "system", "oasisic-2fa", "login_verify"}, post("ajax_login_verify"), nil).dependent = false
 end
 
 -- 检查 oathtool 是否可用
@@ -75,7 +80,7 @@ function set_enabled(enabled)
 	return false
 end
 
--- 验证 TOTP 验证码
+-- 验证 TOTP 验证码（shell 安全版本）
 function verify_totp(code, secret)
 	if not code or code == "" then
 		return false, "验证码不能为空"
@@ -87,22 +92,25 @@ function verify_totp(code, secret)
 		return false, "TOTP 未配置"
 	end
 
-	local cmd = string.format("oathtool --totp -b '%s' 2>/dev/null", secret)
-	local f = io.popen(cmd)
-	local expected = f:read("*line")
-	f:close()
-
-	if not expected then
-		return false, "oathtool 执行失败"
+	-- 使用 shell 安全转义
+	local function shell_escape(s)
+		return "'" .. s:gsub("'", "'\\''") .. "'"
 	end
 
-	-- 支持前后各 1 个时间窗口（共 3 个有效码，各 30 秒）
+	local escaped_secret = shell_escape(secret)
+	local escaped_code = shell_escape(code)
+
+	-- 验证当前码以及前后各 1 个时间窗口（共 3 个有效码，各 30 秒）
 	for offset = -1, 1 do
-		local cmd2 = string.format("oathtool --totp -b '%s' -d 6 --now='%d' 2>/dev/null", secret, offset)
-		local f2 = io.popen(cmd2)
-		local token = f2:read("*line")
-		f2:close()
-		if token and token:match("^%d+$") and token == code then
+		local cmd = string.format("oathtool --totp -b %s -d 6 --now='+%d' 2>/dev/null",
+			escaped_secret, offset)
+		local f = io.popen(cmd)
+		local token = ""
+		if f then
+			token = f:read("*line") or ""
+			f:close()
+		end
+		if token:match("^%d+$") and token == escaped_code:gsub("'\\''", "'"):gsub("^'(.*)'$", "%1") then
 			return true
 		end
 	end
@@ -110,20 +118,113 @@ function verify_totp(code, secret)
 	return false, "验证码无效，请重试"
 end
 
+-- ===== 登录流程：密码校验（不签发 session） =====
+
+function ajax_login_check()
+	http.prepare_content("application/json")
+	local username = http.formvalue("username")
+	local password = http.formvalue("password")
+
+	if not username or not password then
+		http.write_json({success = false, message = "缺少用户名或密码"})
+		return
+	end
+
+	-- 调用 LuCI 标准密码校验
+	local auth_result = sauth.check(username, password)
+	if not auth_result then
+		http.write_json({success = false, message = "用户名或密码错误"})
+		return
+	end
+
+	-- 密码正确，检查 TOTP 是否启用
+	if is_enabled() then
+		-- 生成一次性票据
+		os.execute("mkdir -p " .. PENDING_AUTH_DIR)
+		local ticket = sys.uniqueid(16)
+		local ticket_file = PENDING_AUTH_DIR .. ticket
+		local f = io.open(ticket_file, "w")
+		if f then
+			f:write(username .. "\n")
+			f:write(os.time() .. "\n")
+			f:close()
+		end
+		http.write_json({
+			success = true,
+			totp_required = true,
+			ticket = ticket,
+		})
+	else
+		-- TOTP 未启用，直接完成登录
+		local session = sauth.write(username, "default")
+		http.write_json({
+			success = true,
+			totp_required = false,
+			session = session,
+		})
+	end
+end
+
+-- ===== 登录流程：TOTP 验证 → 签发 session =====
+
+function ajax_login_verify()
+	http.prepare_content("application/json")
+	local code = http.formvalue("code")
+	local ticket = http.formvalue("ticket")
+
+	if not code or not ticket then
+		http.write_json({success = false, message = "缺少验证码或票据"})
+		return
+	end
+
+	-- 验证票据是否存在且未过期
+	local ticket_file = PENDING_AUTH_DIR .. ticket
+	local f = io.open(ticket_file, "r")
+	if not f then
+		http.write_json({success = false, message = "票据无效或已过期"})
+		return
+	end
+
+	local username = f:read("*line")
+	local create_time = tonumber(f:read("*line") or "0")
+	f:close()
+
+	-- 票据有效期 5 分钟
+	local now = os.time()
+	if now - create_time > 300 then
+		os.remove(ticket_file)
+		http.write_json({success = false, message = "票据已过期，请重新登录"})
+		return
+	end
+
+	-- 验证 TOTP 码
+	local ok, err = verify_totp(code)
+	if not ok then
+		http.write_json({success = false, message = err or "验证码无效"})
+		return
+	end
+
+	-- 验证通过，清除票据，签发最终 session
+	os.remove(ticket_file)
+	local session = sauth.write(username, "default")
+
+	http.write_json({
+		success = true,
+		session = session,
+	})
+end
+
 -- ===== AJAX 处理函数 =====
 
--- 获取 TOTP 状态（用于前端）
 function ajax_status()
 	http.prepare_content("application/json")
-	local data = {
+	http.write_json({
 		available = oathtool_available(),
 		enabled = is_enabled(),
 		has_secret = get_secret() ~= nil,
-	}
-	http.write_json(data)
+	})
 end
 
--- 生成新的 TOTP 密钥和二维码数据
 function ajax_generate()
 	http.prepare_content("application/json")
 	if not oathtool_available() then
@@ -131,18 +232,21 @@ function ajax_generate()
 		return
 	end
 
-	-- 生成随机密钥 (Base32, 16 字节 = 26 字符)
-	local cmd = "dd if=/dev/urandom bs=10 count=1 2>/dev/null | base32 | tr -d '=' | head -c 26"
+	-- 生成 16 字节（128 bit）随机密钥 → Base32 编码 → 26 字符
+	local cmd = "dd if=/dev/urandom bs=16 count=1 2>/dev/null | base32 | tr -d '=' | tr -d '\n'"
 	local f = io.popen(cmd)
-	local secret = f:read("*line")
-	f:close()
+	local secret = ""
+	if f then
+		secret = f:read("*all") or ""
+		f:close()
+	end
+	secret = secret:sub(1, 26)
 
-	if not secret or #secret < 10 then
+	if #secret < 10 then
 		http.write_json({success = false, message = "密钥生成失败"})
 		return
 	end
 
-	-- 保存密钥（但不启用）
 	save_secret(secret)
 	set_enabled(false)
 
@@ -160,7 +264,6 @@ function ajax_generate()
 	})
 end
 
--- 启用 TOTP（用户已验证过一次后）
 function ajax_enable()
 	http.prepare_content("application/json")
 	local code = http.formvalue("code")
@@ -173,37 +276,11 @@ function ajax_enable()
 	end
 end
 
--- 禁用 TOTP
 function ajax_disable()
 	http.prepare_content("application/json")
 	set_enabled(false)
-	if os.execute("rm -f " .. TOTP_SECRET_FILE .. " " .. TOTP_ENABLED_FILE) == 0 then
-		http.write_json({success = true})
-	else
-		http.write_json({success = true, message = "配置文件已清除"})
-	end
-end
-
--- 登录时的 TOTP 验证端点
-function verify_action()
-	http.prepare_content("application/json")
-	local code = http.formvalue("code")
-	local session_id = http.formvalue("session")
-
-	-- 验证会话中是否有 2FA pending 标记
-	if not session_id or not nixio.fs.access("/tmp/luci-2fa-" .. session_id) then
-		http.write_json({success = false, message = "会话无效或已过期"})
-		return
-	end
-
-	local ok, err = verify_totp(code)
-	if ok then
-		-- 清除 2FA pending 标记，完成登录
-		os.execute("rm -f /tmp/luci-2fa-" .. session_id)
-		http.write_json({success = true})
-	else
-		http.write_json({success = false, message = err or "验证码无效"})
-	end
+	os.execute("rm -f " .. TOTP_SECRET_FILE .. " " .. TOTP_ENABLED_FILE)
+	http.write_json({success = true, message = "配置已清除"})
 end
 
 return {

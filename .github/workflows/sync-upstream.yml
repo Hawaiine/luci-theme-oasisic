@@ -2,12 +2,11 @@ name: Sync Upstream
 
 on:
   schedule:
-    # Check daily at 6:00 UTC (14:00 Beijing)
     - cron: '0 6 * * *'
   workflow_dispatch:
 
 jobs:
-  check-openwrt-upstream:
+  check-upstream:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,26 +15,52 @@ jobs:
         id: openwrt
         run: |
           LATEST=$(curl -s "https://api.github.com/repos/openwrt/openwrt/releases/latest" | \
-            python3 -c "import sys,json; print(json.load(sys.stdin).get('tag_name','unknown'))" 2>/dev/null || echo "unknown")
-          echo "Latest OpenWrt: $LATEST"
+            python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tag_name','unknown'))" 2>/dev/null || echo "unknown")
           echo "version=$LATEST" >> $GITHUB_OUTPUT
 
       - name: Check Nikki latest release
         id: nikki
         run: |
           LATEST=$(curl -s "https://api.github.com/repos/nikkinikki-org/OpenWrt-nikki/releases/latest" | \
-            python3 -c "import sys,json; print(json.load(sys.stdin).get('tag_name','unknown'))" 2>/dev/null || echo "unknown")
-          echo "Latest Nikki: $LATEST"
+            python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tag_name','unknown'))" 2>/dev/null || echo "unknown")
           echo "version=$LATEST" >> $GITHUB_OUTPUT
 
-      - name: Create compatibility report
+      - name: Generate compatibility report
         run: |
-          echo "## Compatibility Report" > .github/compat-report.md
-          echo "" >> .github/compat-report.md
-          echo "| Component | Current | Latest | Compatible |" >> .github/compat-report.md
-          echo "|-----------|---------|--------|------------|" >> .github/compat-report.md
-          echo "| OpenWrt | 24.10 | ${{ steps.openwrt.outputs.version }} | ✅ |" >> .github/compat-report.md
-          echo "| Nikki | N/A | ${{ steps.nikki.outputs.version }} | - |" >> .github/compat-report.md
-          echo "" >> .github/compat-report.md
-          echo "_Generated: $(date -u +'%Y-%m-%d %H:%M UTC')_" >> .github/compat-report.md
+          OWRT="${{ steps.openwrt.outputs.version }}"
+          NIKKI="${{ steps.nikki.outputs.version }}"
+          DATE=$(date -u +'%Y-%m-%d %H:%M UTC')
+
+          # Compare versions (simplified)
+          if [ "$OWRT" = "unknown" ]; then
+            COMPAT="⚠️ 未知"
+          elif echo "$OWRT" | grep -qE "^v?(24\.10|25\.|23\.05)"; then
+            COMPAT="✅ 兼容"
+          else
+            COMPAT="⚠️ 需测试"
+          fi
+
+          cat > .github/compat-report.md << EOF
+          ## 上游兼容性报告
+
+          | 组件 | 最新版本 | 兼容性 | 检查时间 |
+          |------|---------|--------|---------|
+          | **OpenWrt** | \`$OWRT\` | $COMPAT | $DATE |
+          | **Nikki** | \`$NIKKI\` | ⏳ 待测试 | $DATE |
+
+          _自动生成于 $DATE_
+          EOF
+
           cat .github/compat-report.md
+
+      - name: Commit and push report
+        run: |
+          git config user.name "Oasisic Bot"
+          git config user.email "bot@oasisic.dev"
+          git add .github/compat-report.md
+          if git diff --cached --quiet; then
+            echo "无变化，跳过提交"
+          else
+            git commit -m "📊 上游兼容性报告（OpenWrt: ${{ steps.openwrt.outputs.version }} / Nikki: ${{ steps.nikki.outputs.version }}）"
+            git push
+          fi

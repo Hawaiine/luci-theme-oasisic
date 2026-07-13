@@ -1,6 +1,8 @@
 /*!
  * luci-theme-oasisic — Login page
  * v1.0.0
+ * 安全登录流程：密码校验 → TOTP 验证 → 签发 session
+ * 密码正确但未通过 TOTP 时不会签发最终 session cookie
  */
 
 var OasisicLogin = (function() {
@@ -9,11 +11,8 @@ var OasisicLogin = (function() {
   var WALLPAPER_INTERVAL = 6 * 60 * 60 * 1000;
   var BING_API = 'https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN';
   var FALLBACK_BG = 'linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)';
-
-  var config = {
-    totpEnabled: false,
-    totpAvailable: false,
-  };
+  var pendingTicket = null;
+  var config = { totpEnabled: false, totpAvailable: false };
 
   function init(opts) {
     if (opts) {
@@ -22,7 +21,8 @@ var OasisicLogin = (function() {
     }
     loadWallpaper();
     bindFormSubmit();
-    bindTOTPCodeInput();
+    bindTOTPSubmit();
+    bindTOTPInput();
   }
 
   // ===== Bing 壁纸 =====
@@ -30,11 +30,9 @@ var OasisicLogin = (function() {
   function loadWallpaper() {
     var bgEl = document.getElementById('loginBg');
     if (!bgEl) return;
-
     var cachedUrl = localStorage.getItem('oasisic-wallpaper-url');
     var cachedTime = localStorage.getItem('oasisic-wallpaper-time');
     var now = Date.now();
-
     if (cachedUrl && cachedTime && (now - parseInt(cachedTime) < WALLPAPER_INTERVAL)) {
       setBackground(bgEl, cachedUrl);
       return;
@@ -46,7 +44,6 @@ var OasisicLogin = (function() {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', BING_API, true);
     xhr.timeout = 5000;
-
     xhr.onload = function() {
       if (xhr.status === 200) {
         try {
@@ -58,7 +55,7 @@ var OasisicLogin = (function() {
             localStorage.setItem('oasisic-wallpaper-time', String(Date.now()));
             return;
           }
-        } catch (e) { /* fall through */ }
+        } catch (e) { /* fall */ }
       }
       fallbackBackground(bgEl);
     };
@@ -78,87 +75,101 @@ var OasisicLogin = (function() {
     el.style.backgroundImage = FALLBACK_BG;
   }
 
-  // ===== 登录表单 =====
+  // ===== 安全登录流程 =====
 
   function bindFormSubmit() {
     var form = document.getElementById('loginForm');
     if (!form) return;
 
     form.addEventListener('submit', function(e) {
+      e.preventDefault();
       var username = document.getElementById('username');
       var password = document.getElementById('password');
-
       if (!username.value || !password.value) {
-        e.preventDefault();
         shakeCard();
         return;
       }
-
-      // 如果 TOTP 已启用，拦截表单提交
-      if (config.totpEnabled && config.totpAvailable) {
-        e.preventDefault();
-        // 先提交密码验证
-        submitPassword(username.value, password.value);
-      }
-      // 否则正常提交（未启用 TOTP 时 LuCI 原生处理）
+      submitLogin(username.value, password.value);
     });
   }
 
-  function submitPassword(username, password) {
+  function submitLogin(username, password) {
+    showLoading(true);
+
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', window.location.href, true);
+    xhr.open('POST', Luci.location.path + '/login_check', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
     xhr.onload = function() {
+      showLoading(false);
       if (xhr.status === 200) {
-        // 密码正确 → 切到 TOTP 步骤
-        showTOTPStep();
-      } else if (xhr.status === 403) {
-        shakeCard();
-        showToast('密码错误，请重试');
-      } else {
-        // 可能 LuCI 直接返回了重定向（TOTP 未启用时正常登录）
-        if (!config.totpEnabled) {
-          // 正常表单提交，让页面跳转
-          document.getElementById('loginForm').submit();
+        try {
+          var data = JSON.parse(xhr.responseText);
+          if (!data.success) {
+            shakeCard();
+            showError(data.message || '登录失败');
+            return;
+          }
+
+          if (data.totp_required) {
+            // TOTP 已启用：保存票据，显示 TOTP 输入
+            pendingTicket = data.ticket;
+            showTOTPStep();
+          } else {
+            // TOTP 未启用：session 已签发，跳转
+            window.location.href = data.redirect || '/cgi-bin/luci/admin';
+          }
+        } catch (e) {
+          shakeCard();
+          showError('服务器响应异常');
         }
+      } else {
+        shakeCard();
+        showError('服务器错误 (' + xhr.status + ')');
       }
     };
+
     xhr.onerror = function() {
-      // 网络错误时回退到原生提交
-      document.getElementById('loginForm').submit();
+      showLoading(false);
+      showError('网络错误');
     };
-    xhr.send('username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password) + '&remember=' + (document.getElementById('remember').checked ? '1' : '0'));
+
+    xhr.send('username=' + encodeURIComponent(username) +
+      '&password=' + encodeURIComponent(password));
   }
 
-  // ===== TOTP 步骤 =====
+  // ===== TOTP 验证步骤 =====
 
   function showTOTPStep() {
     document.getElementById('loginStep1').style.display = 'none';
     document.getElementById('loginStep2').style.display = 'block';
     document.getElementById('totp-code').focus();
-    document.getElementById('totp-verify-btn').disabled = false;
   }
 
   function backToLogin() {
     document.getElementById('loginStep2').style.display = 'none';
     document.getElementById('loginStep1').style.display = 'block';
-    document.getElementById('password').focus();
+    pendingTicket = null;
   }
 
-  function bindTOTPCodeInput() {
+  function bindTOTPSubmit() {
+    var btn = document.getElementById('totp-verify-btn');
+    if (btn) {
+      btn.addEventListener('click', verifyTOTP);
+    }
+  }
+
+  function bindTOTPInput() {
     var input = document.getElementById('totp-code');
     if (input) {
       input.addEventListener('input', function() {
-        hideTOTPError();
+        hideError();
         if (this.value.length === 6) {
-          // 自动提交
           setTimeout(verifyTOTP, 200);
         }
       });
       input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && this.value.length === 6) {
-          verifyTOTP();
-        }
+        if (e.key === 'Enter' && this.value.length === 6) verifyTOTP();
       });
     }
   }
@@ -166,61 +177,62 @@ var OasisicLogin = (function() {
   function verifyTOTP() {
     var code = document.getElementById('totp-code').value.trim();
     if (!code || code.length !== 6) {
-      showTOTPError('请输入 6 位验证码');
+      showError('请输入 6 位验证码');
+      return;
+    }
+    if (!pendingTicket) {
+      showError('会话已过期，请重新登录');
       return;
     }
 
+    showLoading(true);
     var btn = document.getElementById('totp-verify-btn');
-    btn.disabled = true;
-    btn.textContent = '⏳ 验证中...';
+    if (btn) btn.disabled = true;
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', Luci.location.path + '/verify', true);
+    xhr.open('POST', Luci.location.path + '/login_verify', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
     xhr.onload = function() {
-      btn.disabled = false;
-      btn.textContent = '验证';
+      showLoading(false);
+      if (btn) btn.disabled = false;
       if (xhr.status === 200) {
         try {
           var data = JSON.parse(xhr.responseText);
           if (data.success) {
-            // TOTP 验证通过，携带 session 重定向到管理页面
-            window.location.href = data.redirect || '/cgi-bin/luci/admin';
+            window.location.href = '/cgi-bin/luci/admin';
           } else {
-            showTOTPError(data.message || '验证码无效');
+            showError(data.message || '验证码无效');
             document.getElementById('totp-code').value = '';
             document.getElementById('totp-code').focus();
             shakeCard();
           }
         } catch (e) {
-          showTOTPError('响应解析失败');
+          showError('服务器响应异常');
         }
       } else {
-        showTOTPError('服务器错误');
+        showError('验证失败 (' + xhr.status + ')');
+        if (btn) btn.disabled = false;
       }
     };
+
     xhr.onerror = function() {
-      showTOTPError('网络错误');
-      btn.disabled = false;
-      btn.textContent = '验证';
+      showLoading(false);
+      showError('网络错误');
+      if (btn) btn.disabled = false;
     };
-    xhr.send('code=' + encodeURIComponent(code));
-  }
 
-  function showTOTPError(msg) {
-    var el = document.getElementById('totp-error');
-    if (el) {
-      el.textContent = msg;
-      el.style.display = 'block';
-    }
-  }
-
-  function hideTOTPError() {
-    var el = document.getElementById('totp-error');
-    if (el) el.style.display = 'none';
+    xhr.send('code=' + encodeURIComponent(code) + '&ticket=' + encodeURIComponent(pendingTicket));
   }
 
   // ===== 通用 =====
+
+  function showLoading(show) {
+    var btn = document.getElementById('loginBtn') || document.getElementById('totp-verify-btn');
+    if (btn) btn.disabled = show;
+    var spinner = document.getElementById('loginSpinner');
+    if (spinner) spinner.style.display = show ? 'block' : 'none';
+  }
 
   function shakeCard() {
     var card = document.getElementById('loginCard');
@@ -232,20 +244,24 @@ var OasisicLogin = (function() {
     }
   }
 
-  function showToast(msg, type) {
-    type = type || 'error';
-    if (window.Oasisic && Oasisic.showToast) {
-      Oasisic.showToast(msg, type);
-    } else if (typeof msg === 'string') {
-      alert(msg);
+  function showError(msg) {
+    var el = document.getElementById('loginError');
+    if (el) {
+      el.textContent = msg;
+      el.style.display = 'block';
     }
+  }
+
+  function hideError() {
+    var el = document.getElementById('loginError');
+    if (el) el.style.display = 'none';
   }
 
   function passkeyAuth() {
     if (window.PublicKeyCredential) {
-      showToast('Passkey 认证尚未完成配置', 'info');
+      Oasisic.showToast('Passkey 认证尚未完成配置', 'info');
     } else {
-      showToast('当前设备不支持 Passkey', 'error');
+      Oasisic.showToast('当前设备不支持 Passkey', 'error');
     }
   }
 

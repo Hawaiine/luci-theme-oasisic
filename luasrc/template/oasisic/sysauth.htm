@@ -11,6 +11,7 @@
 	<link rel="stylesheet" href="<%=media%>/css/login.css">
 	<link rel="icon" type="image/svg+xml" href="<%=media%>/img/logo.svg">
 
+	<script src="<%=media%>/js/oasisic.js"></script>
 	<script src="<%=media%>/js/login.js"></script>
 </head>
 <body class="oasisic-login-body">
@@ -19,7 +20,9 @@
 		<div class="oasisic-login-overlay"></div>
 
 		<div class="oasisic-login-card" id="loginCard">
-			<!-- 第一步：密码登录 -->
+			<div id="loginError" class="oasisic-login-error" style="display:none;"></div>
+
+			<!-- 第一步：密码登录（提交到自定义 handler，不直接走 LuCI sysauth） -->
 			<div id="loginStep1">
 				<div class="oasisic-login-brand">
 					<div class="oasisic-login-logo">
@@ -32,17 +35,17 @@
 				<h3 class="oasisic-login-title"><%=translate("Welcome back")%></h3>
 				<p class="oasisic-login-hint"><%=translate("Log in to manage your router")%></p>
 
-				<form method="post" action="<%=REQUEST_URI%>" class="oasisic-login-form" id="loginForm">
+				<div class="oasisic-login-form" id="loginForm">
 					<div class="oasisic-login-field">
-						<input id="username" name="username" type="text" placeholder="<%=translate('Username')%>" autocomplete="username" required autofocus>
+						<input id="username" type="text" placeholder="<%=translate('Username')%>" autocomplete="username" required autofocus>
 					</div>
 					<div class="oasisic-login-field">
-						<input id="password" name="password" type="password" placeholder="<%=translate('Password')%>" autocomplete="current-password" required>
+						<input id="password" type="password" placeholder="<%=translate('Password')%>" autocomplete="current-password" required>
 					</div>
 
 					<div class="oasisic-login-options">
 						<label class="oasisic-login-remember">
-							<input type="checkbox" name="remember" id="remember" checked>
+							<input type="checkbox" id="remember" checked>
 							<span><%=translate("Remember me")%></span>
 						</label>
 						<% if luci.sys.call("which webauthn-token >/dev/null 2>&1") == 0 then %>
@@ -52,16 +55,16 @@
 						<% end %>
 					</div>
 
-					<button type="submit" class="oasisic-login-btn"><%=translate("Login")%></button>
+					<button type="submit" class="oasisic-login-btn" id="loginBtn"><%=translate("Login")%></button>
 
 					<div class="oasisic-login-footer">
 						<span>luci-theme-oasisic</span>
 						<span class="oasisic-login-ver">v1.0.0</span>
 					</div>
-				</form>
+				</div>
 			</div>
 
-			<!-- 第二步：TOTP 验证（隐藏，2FA 启用时显示） -->
+			<!-- 第二步：TOTP 验证（仅 TOTP 启用时出现） -->
 			<div id="loginStep2" style="display:none;">
 				<div class="oasisic-login-brand">
 					<div class="oasisic-login-logo">
@@ -76,10 +79,10 @@
 
 				<div class="oasisic-login-form">
 					<div class="oasisic-login-field">
-						<input id="totp-code" type="text" placeholder="<%=translate('6-digit code')%>" maxlength="6" autocomplete="one-time-code" style="text-align:center;font-size:22px;letter-spacing:6px;font-family:var(--font-mono);padding:14px;">
+						<input id="totp-code" type="text" placeholder="<%=translate('6-digit code')%>" maxlength="6" autocomplete="one-time-code"
+							style="text-align:center;font-size:22px;letter-spacing:6px;font-family:var(--font-mono);padding:14px;">
 					</div>
-					<div id="totp-error" class="oasisic-login-error" style="display:none;"></div>
-					<button class="oasisic-login-btn" onclick="OasisicLogin.verifyTOTP()" id="totp-verify-btn"><%=translate("Verify")%></button>
+					<button class="oasisic-login-btn" id="totp-verify-btn"><%=translate("Verify")%></button>
 					<button class="oasisic-login-2fa" onclick="OasisicLogin.backToLogin()"><%=translate("Back to login")%></button>
 				</div>
 			</div>
@@ -92,7 +95,7 @@
 
 	<script>
 		OasisicLogin.init({
-			totpEnabled: <%= luci.sys.call("test -f /etc/oasisic/totp_enabled && cat /etc/oasisic/totp_enabled") == 0 and "true" or "false" %>,
+			totpEnabled: <%= luci.sys.call("test -f /etc/oasisic/totp_enabled") == 0 and "true" or "false" %>,
 			totpAvailable: <%= luci.sys.call("command -v oathtool >/dev/null 2>&1") == 0 and "true" or "false" %>
 		});
 	</script>
