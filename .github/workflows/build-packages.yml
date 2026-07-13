@@ -6,10 +6,11 @@ on:
       openwrt_branch:
         description: 'OpenWrt 分支'
         required: true
-        default: 'openwrt-24.10'
+        default: 'openwrt-25.12'
         type: choice
         options:
           - main
+          - openwrt-25.12
           - openwrt-24.10
           - openwrt-23.05
       arch:
