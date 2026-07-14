@@ -109,6 +109,8 @@ jobs:
           echo "CONFIG_PACKAGE_oath-toolkit=y" >> .config
           # 选中 luci
           echo "CONFIG_PACKAGE_luci=y" >> .config
+          # 选中签名（生成 key-build）
+          echo "CONFIG_SIGNED_PACKAGES=y" >> .config
           make defconfig
 
       - name: 编译主题包
