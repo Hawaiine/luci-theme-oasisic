@@ -114,10 +114,20 @@ jobs:
       - name: 编译主题包
         run: |
           cd openwrt
-          # 工具链如果未缓存则编译
           make tools/install -j$(nproc) 2>/dev/null || true
           make toolchain/install -j$(nproc) 2>/dev/null || true
           make package/luci-theme-oasisic/compile -j$(nproc) V=s
+
+      - name: 签名 APK 包
+        run: |
+          cd openwrt
+          PKG_FILE=$(find bin/ -name 'luci-theme-oasisic*.apk' 2>/dev/null | head -1)
+          if [ -n "$PKG_FILE" ] && [ -f "key-build" ]; then
+            ./staging_dir/host/bin/usign -S -m "$PKG_FILE" -s key-build -x "${PKG_FILE}.sig"
+            echo "✅ APK 已签名"
+          elif [ -n "$PKG_FILE" ]; then
+            echo "⚠️ 未找到签名密钥，跳过签名"
+          fi
 
       - name: 收集编译产物
         run: |
