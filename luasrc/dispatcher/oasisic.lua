@@ -1,8 +1,5 @@
---[[
-luci-theme-oasisic — 主题注册器
-使用标准 LuCI 主题机制：目录结构约定 + uci 配置
-主题通过 Makefile 安装到正确路径，在 系统 → 语言和界面 中选择生效
-]]
+-- luci-theme-oasisic — 主题版本信息
+-- LuCI 主题通过目录结构 + uci 配置生效，此文件仅提供版本号
 
 module("luci.dispatcher.oasisic", package.seeall)
 

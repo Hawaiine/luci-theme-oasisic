@@ -1,14 +1,13 @@
 #
 # Copyright (C) 2026 Oasisic OpenWrt
-#
-# This is free software, licensed under the Apache 2.0 License.
+# Licensed under Apache 2.0
 #
 
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=Oasisic — A modern, elegant LuCI theme
 LUCI_DESCRIPTION:=Apple-inspired minimal design with bypass gateway awareness, Nikki proxy status, daily Bing wallpapers, and full dark/light mode support.
-LUCI_DEPENDS:=+luci-base +oath-toolkit
+LUCI_DEPENDS:=+luci-base
 
 PKG_NAME:=luci-theme-oasisic
 PKG_VERSION:=1.0.0
@@ -39,30 +38,15 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/install
-	$(INSTALL_DIR) $(1)/www/luci-static/oasisic
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/oasisic
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/dispatcher
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller/oasisic
-	$(INSTALL_DIR) $(1)/usr/share/ucode/luci/template/oasisic
+	$(INSTALL_DIR) $(1)/www/luci-static/oasisic/css
+	$(INSTALL_DIR) $(1)/www/luci-static/oasisic/js
+	$(INSTALL_DIR) $(1)/www/luci-static/oasisic/img
 
-	# Static assets
-	$(CP) ./htdocs/luci-static/oasisic/* $(1)/www/luci-static/oasisic/
-
-	# Lua templates
-	$(CP) ./luasrc/template/oasisic/* $(1)/usr/lib/lua/luci/view/oasisic/
-
-	# Lua dispatcher
-	$(CP) ./luasrc/dispatcher/oasisic.lua $(1)/usr/lib/lua/luci/dispatcher/
-
-	# Lua controller (2FA + config)
-	$(CP) ./luasrc/controller/oasisic/* $(1)/usr/lib/lua/luci/controller/oasisic/
-
-	# Lua CBI model (config)
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi
-	$(CP) ./luasrc/model/cbi/* $(1)/usr/lib/lua/luci/model/cbi/
-
-	# ucode templates
-	$(CP) ./ucode/template/oasisic/* $(1)/usr/share/ucode/luci/template/oasisic/
+	$(CP) ./htdocs/luci-static/oasisic/css/* $(1)/www/luci-static/oasisic/css/
+	$(CP) ./htdocs/luci-static/oasisic/js/* $(1)/www/luci-static/oasisic/js/
+	$(CP) ./htdocs/luci-static/oasisic/img/* $(1)/www/luci-static/oasisic/img/
+	$(CP) ./htdocs/luci-static/oasisic/manifest.json $(1)/www/luci-static/oasisic/
+	$(CP) ./htdocs/luci-static/oasisic/sw.js $(1)/www/luci-static/oasisic/
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))

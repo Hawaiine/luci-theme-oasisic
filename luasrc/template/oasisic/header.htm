@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="<%=luci.i18n.media_plain()%>" data-theme="<%=L.theme_mode()%>" data-version="1.0.0"
-	  data-theme-color="<%=luci.model.uci.cursor():get('oasisic', 'config', 'theme_color') or 'blue'%>"
-	  data-sidebar="<%=luci.model.uci.cursor():get('oasisic', 'config', 'sidebar_mode') or 'expanded'%>">
+<html lang="<%=luci.i18n.media_plain()%>" data-theme="dark">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,25 +14,14 @@
 	<link rel="stylesheet" href="<%=media%>/css/oasisic.css">
 	<link rel="stylesheet" href="<%=media%>/css/presets.css">
 	<link rel="stylesheet" href="<%=media%>/css/oasisic-dark.css" media="(prefers-color-scheme: dark)">
-	<link rel="stylesheet" href="<%=media%>/css/nikki.css">
 	<link rel="icon" type="image/svg+xml" href="<%=media%>/img/logo.svg">
 
 	<script src="<%=media%>/js/oasisic.js"></script>
 </head>
 <body>
-	<div id="app" class="oasisic-layout">
-		<%- include("oasisic/sidebar") %>
-
-		<main id="maincontent" class="oasisic-main">
-			<div class="oasisic-header">
-				<div class="oasisic-header-left">
-					<button class="oasisic-sidebar-toggle" onclick="Oasisic.toggleSidebar()" aria-label="Toggle sidebar">
-						<span></span><span></span><span></span>
-					</button>
-					<h2 class="oasisic-page-title"><%=luci.http.write(luci.dispatcher.context.requestpath[#luci.dispatcher.context.requestpath])%></h2>
-				</div>
-				<div class="oasisic-header-right">
-					<span class="oasisic-version">v<%= require("luci.dispatcher.oasisic").version() %></span>
-				</div>
-			</div>
-			<div class="oasisic-content">
+	<div id="maincontent">
+		<div class="oasisic-header">
+			<h2 class="oasisic-page-title"><%=striptags(lui18n.translatef(luci.dispatcher.context.requestpath[#luci.dispatcher.context.requestpath] or ""))%></h2>
+			<div class="oasisic-version">v1.0.0</div>
+		</div>
+		<div class="oasisic-content">
