@@ -41,12 +41,20 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/www/luci-static/oasisic/css
 	$(INSTALL_DIR) $(1)/www/luci-static/oasisic/js
 	$(INSTALL_DIR) $(1)/www/luci-static/oasisic/img
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/oasisic
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/dispatcher
+	$(INSTALL_DIR) $(1)/usr/share/ucode/luci/template/oasisic
 
 	$(CP) ./htdocs/luci-static/oasisic/css/* $(1)/www/luci-static/oasisic/css/
 	$(CP) ./htdocs/luci-static/oasisic/js/* $(1)/www/luci-static/oasisic/js/
 	$(CP) ./htdocs/luci-static/oasisic/img/* $(1)/www/luci-static/oasisic/img/
 	$(CP) ./htdocs/luci-static/oasisic/manifest.json $(1)/www/luci-static/oasisic/
 	$(CP) ./htdocs/luci-static/oasisic/sw.js $(1)/www/luci-static/oasisic/
+
+	$(CP) ./luasrc/template/oasisic/* $(1)/usr/lib/lua/luci/view/oasisic/
+	$(CP) ./luasrc/dispatcher/oasisic.lua $(1)/usr/lib/lua/luci/dispatcher/
+
+	$(CP) ./ucode/template/oasisic/* $(1)/usr/share/ucode/luci/template/oasisic/
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
