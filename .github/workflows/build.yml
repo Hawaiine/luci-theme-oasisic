@@ -1,0 +1,27 @@
+name: 编译
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: 编译
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq build-essential gawk wget git diffstat unzip texinfo zstd libssl-dev flex bison python3 python3-pip file gcc-multilib g++-multilib rsync gettext
+          git clone --depth=1 -b openwrt-25.12 https://github.com/openwrt/openwrt.git
+          ln -s $GITHUB_WORKSPACE openwrt/package/luci-theme-oasisic
+          cd openwrt
+          ./scripts/feeds update -a && ./scripts/feeds install -a
+          echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
+          make defconfig
+          make package/luci-theme-oasisic/compile -j$(nproc) V=s
+      - name: 上传
+        uses: actions/upload-artifact@v7
+        with:
+          name: oasisic-x86_64-25.12
+          path: openwrt/bin/packages/x86_64/base/luci-theme-oasisic*.apk
