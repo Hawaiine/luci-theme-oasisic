@@ -12,19 +12,19 @@ jobs:
       - uses: actions/checkout@v7
       - name: 编译
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq build-essential gawk wget git diffstat unzip texinfo zstd libssl-dev flex bison python3 python3-pip file gcc-multilib g++-multilib rsync gettext libdeflate-dev
+          sudo apt-get update -qq && sudo apt-get install -y -qq build-essential gawk wget git diffstat unzip texinfo zstd libssl-dev flex bison python3 python3-pip file gcc-multilib g++-multilib rsync gettext libdeflate-tools
           git clone --depth=1 -b openwrt-25.12 https://github.com/openwrt/openwrt.git
           ln -s $GITHUB_WORKSPACE openwrt/package/luci-theme-oasisic
           cd openwrt
           ./scripts/feeds update -a && ./scripts/feeds install -a
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
           make defconfig
-          # 禁用 libdeflate（host 编译时 libdeflate-gzip 不存在导致 tar 解压失败）
-          sed -i 's/CONFIG_LIBDEFLATE=y/CONFIG_LIBDEFLATE=n/' .config
-          # 禁用签名包（不需要私钥文件）
-          sed -i 's/CONFIG_SIGNED_PACKAGES=y/CONFIG_SIGNED_PACKAGES=n/' .config
-          make olddefconfig
-          make package/luci-theme-oasisic/compile -j$(nproc) V=s
+          # 创建 libdeflate-gzip 软链（host 编译需要，但系统可能没有）
+          mkdir -p staging_dir/host/bin
+          ln -sf /usr/bin/gzip staging_dir/host/bin/libdeflate-gzip 2>/dev/null || true
+          # 生成签名密钥（CONFIG_SIGNED_PACKAGES 需要 private-key.pem）
+          openssl genrsa -out private-key.pem 2048 2>/dev/null
+          make package/luci-theme-oasisic/compile -j$(nproc) V=s 2>&1
       - name: 上传
         uses: actions/upload-artifact@v7
         with:
