@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<%=luci.i18n.media_plain()%>" data-theme="dark">
+<html lang="<%=luci.i18n.media_plain()%>" data-theme="dark" data-sidebar="">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,9 +19,166 @@
 	<script src="<%=media%>/js/oasisic.js"></script>
 </head>
 <body>
-	<div id="maincontent">
-		<div class="oasisic-header">
-			<h2 class="oasisic-page-title"><%=striptags(lui18n.translatef(luci.dispatcher.context.requestpath[#luci.dispatcher.context.requestpath] or ""))%></h2>
-			<div class="oasisic-version">v1.0.0</div>
-		</div>
-		<div class="oasisic-content">
+	<div id="app" class="oasisic-layout">
+		<!-- 侧栏导航 -->
+		<aside class="oasisic-sidebar" id="oasisicSidebar">
+			<!-- 品牌标识 -->
+			<div class="oasisic-sidebar-brand">
+				<div class="oasisic-sidebar-logo">
+					<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M12 2L2 7l10 5 10-5-10-5z"/>
+						<path d="M2 17l10 5 10-5"/>
+						<path d="M2 12l10 5 10-5"/>
+					</svg>
+				</div>
+				<span class="oasisic-sidebar-name">Oasisic</span>
+			</div>
+
+			<!-- 主菜单（遍历 LuCI 菜单树） -->
+			<nav class="oasisic-sidebar-nav">
+				<ul class="oasisic-nav-list" id="oasisicMenu">
+					<%
+						local treecache = luci.dispatcher.context.treecache
+						local baseurl = luci.dispatcher.context.path
+						local requestpath = luci.dispatcher.context.requestpath
+						local selected = requestpath and #requestpath > 0 and requestpath[1]
+
+						if treecache then
+							-- 展平一级菜单（排除系统管理类后台节点）
+							local main_nodes = {}
+							for _, node in ipairs(treecache) do
+								if node.title and node.title ~= "" and node.module then
+									local is_admin = false
+									if node.child and #node.child > 0 then
+										local has_visible = false
+										for _, child in ipairs(node.child) do
+											if child.title and child.title ~= "" then
+												has_visible = true
+												break
+											end
+										end
+										if has_visible then
+											table.insert(main_nodes, node)
+										end
+									elseif node.target and node.target ~= "firstchild" then
+										table.insert(main_nodes, node)
+									end
+								end
+							end
+
+							-- 优先排序：状态、网络、服务、系统
+							local priority = { status = 1, network = 2, services = 3, system = 999 }
+							table.sort(main_nodes, function(a, b)
+								local pa = priority[a.module] or 50
+								local pb = priority[b.module] or 50
+								if pa ~= pb then return pa < pb end
+								return (a.title or "") < (b.title or "")
+							end)
+
+							for _, node in ipairs(main_nodes) do
+								local is_active = (node.module == selected)
+								local has_children = false
+								local children_html = ""
+
+								if node.child and #node.child > 0 then
+									has_children = true
+									local child_items = {}
+									for _, child in ipairs(node.child) do
+										if child.title and child.title ~= "" then
+											local child_path = node.module .. "/" .. child.module
+											local child_is_active = (requestpath and #requestpath >= 2
+												and requestpath[1] == node.module
+												and requestpath[2] == child.module)
+											local child_url = child.target == "firstchild"
+												and luci.dispatcher.build_url("admin", node.module, child.module)
+												or (child.path and luci.dispatcher.build_url(child.path)
+													or luci.dispatcher.build_url("admin", node.module, child.module))
+
+											table.insert(child_items, string.format(
+												'<li class="oasisic-nav-subitem"><a href="%s" class="oasisic-nav-sublink%s">%s</a></li>',
+												child_url,
+												child_is_active and ' active' or '',
+												luci.i18n.translatef(child.title) or child.title
+											))
+										end
+									end
+									if #child_items > 0 then
+										children_html = '<ul class="oasisic-nav-submenu">' .. table.concat(child_items) .. '</ul>'
+									end
+								end
+
+								local node_url = (node.target and node.target ~= "firstchild" and node.path)
+									and luci.dispatcher.build_url(node.path)
+									or luci.dispatcher.build_url("admin", node.module)
+
+								%>
+								<li class="oasisic-nav-item<%=is_active and ' active' or ''%>">
+									<a href="<%=node_url%>" class="oasisic-nav-link">
+										<span class="oasisic-nav-icon"><%=node.icon or ''%></span>
+										<span class="oasisic-nav-label"><%=luci.i18n.translatef(node.title) or node.title%></span>
+									</a>
+									<%=children_html%>
+								</li>
+							<% end %>
+						<% end %>
+					%>
+				</ul>
+			</nav>
+
+			<!-- 侧栏底部：版本信息 -->
+			<div class="oasisic-sidebar-footer">
+				<div class="oasisic-sidebar-version">luci-theme-oasisic v1.0.0</div>
+			</div>
+		</aside>
+
+		<!-- 主内容区域 -->
+		<main id="maincontent" class="oasisic-main">
+			<!-- 页面头部 -->
+			<div class="oasisic-header">
+				<div class="oasisic-header-left">
+					<button class="oasisic-sidebar-toggle" onclick="Oasisic.toggleSidebar()" title="Toggle sidebar">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<line x1="3" y1="6" x2="21" y2="6"/>
+							<line x1="3" y1="12" x2="21" y2="12"/>
+							<line x1="3" y1="18" x2="21" y2="18"/>
+						</svg>
+					</button>
+					<h2 class="oasisic-page-title">
+						<%=striptags(luci.i18n.translatef(
+							luci.dispatcher.context.requestpath[#luci.dispatcher.context.requestpath] or ""
+						))%>
+					</h2>
+				</div>
+				<div class="oasisic-header-right">
+					<!-- 面包屑导航 -->
+					<%
+										local reqpath = luci.dispatcher.context.requestpath
+										if reqpath and #reqpath > 0 then
+											local parts = {}
+											for i, part in ipairs(reqpath) do
+												local label = part
+												if treecache then
+													for _, node in ipairs(treecache) do
+														if node.module == part then
+															label = luci.i18n.translatef(node.title) or part
+															break
+														end
+														if node.child then
+															for _, child in ipairs(node.child) do
+																if child.module == part then
+																	label = luci.i18n.translatef(child.title) or part
+																	break
+																end
+															end
+														end
+													end
+												end
+												table.insert(parts, '<span class="oasisic-breadcrumb-item">' .. luci.util.pcdata(label) .. '</span>')
+											end
+											%>
+											<nav class="oasisic-breadcrumb"><%=table.concat(parts, ' <span class="oasisic-breadcrumb-sep">/</span> ')%></nav>
+										<% end %>
+					<span class="oasisic-version">v1.0.0</span>
+				</div>
+			</div>
+			<div class="oasisic-content">

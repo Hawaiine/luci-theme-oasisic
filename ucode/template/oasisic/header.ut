@@ -15,7 +15,24 @@
 </head>
 <body>
 	<div id="app" class="oasisic-layout">
-		<aside class="oasisic-sidebar">...</aside>
+		<aside class="oasisic-sidebar">
+			<div class="oasisic-sidebar-brand">
+				<span class="oasisic-sidebar-name">Oasisic</span>
+			</div>
+			<nav class="oasisic-sidebar-nav">
+				<ul class="oasisic-nav-list">
+					{% for _, node in ipairs(luci.dispatcher.context.treecache or {}) do %}
+						{% if node.title and node.title ~= "" then %}
+						<li class="oasisic-nav-item">
+							<a href="{{ luci.dispatcher.build_url('admin', node.module) }}" class="oasisic-nav-link">
+								<span class="oasisic-nav-label">{{ translate(node.title) }}</span>
+							</a>
+						</li>
+						{% end %}
+					{% end %}
+				</ul>
+			</nav>
+		</aside>
 		<main id="maincontent" class="oasisic-main">
 			<div class="oasisic-header">
 				<div class="oasisic-header-left">

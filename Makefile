@@ -43,7 +43,10 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/www/luci-static/oasisic/img
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/oasisic
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/dispatcher
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller/oasisic
 	$(INSTALL_DIR) $(1)/usr/share/ucode/luci/template/oasisic
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
 
 	$(CP) ./htdocs/luci-static/oasisic/css/* $(1)/www/luci-static/oasisic/css/
 	$(CP) ./htdocs/luci-static/oasisic/js/* $(1)/www/luci-static/oasisic/js/
@@ -53,8 +56,12 @@ define Package/$(PKG_NAME)/install
 
 	$(CP) ./luasrc/template/oasisic/* $(1)/usr/lib/lua/luci/view/oasisic/
 	$(CP) ./luasrc/dispatcher/oasisic.lua $(1)/usr/lib/lua/luci/dispatcher/
+	$(CP) ./luasrc/controller/oasisic/* $(1)/usr/lib/lua/luci/controller/oasisic/
 
 	$(CP) ./ucode/template/oasisic/* $(1)/usr/share/ucode/luci/template/oasisic/
+
+	$(CP) ./root/etc/uci-defaults/* $(1)/etc/uci-defaults/
+	$(CP) ./root/usr/share/luci/menu.d/* $(1)/usr/share/luci/menu.d/
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))

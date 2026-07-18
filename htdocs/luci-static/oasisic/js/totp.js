@@ -13,7 +13,7 @@ var OasisicTOTP = (function() {
 
   function fetchStatus() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', Luci.location.path + '/status', true);
+    xhr.open('GET', OASISIC_API_PATH + '/status', true);
     xhr.onload = function() {
       if (xhr.status === 200) {
         try {
@@ -48,7 +48,7 @@ var OasisicTOTP = (function() {
     btn.textContent = '⏳ 生成中...';
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', Luci.location.path + '/generate', true);
+    xhr.open('POST', OASISIC_API_PATH + '/generate', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onload = function() {
       btn.disabled = false;
@@ -106,7 +106,7 @@ var OasisicTOTP = (function() {
     btn.textContent = '⏳ 验证中...';
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', Luci.location.path + '/enable', true);
+    xhr.open('POST', OASISIC_API_PATH + '/enable', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onload = function() {
       btn.disabled = false;
@@ -132,7 +132,7 @@ var OasisicTOTP = (function() {
     if (!confirm('确定要停用两步验证吗？')) return;
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', Luci.location.path + '/disable', true);
+    xhr.open('POST', OASISIC_API_PATH + '/disable', true);
     xhr.onload = function() {
       if (xhr.status === 200) {
         location.reload();

@@ -1,0 +1,11 @@
+#!/bin/sh
+# luci-theme-oasisic — register theme in LuCI configuration
+# Reference: OpenWrt luci-theme-bootstrap root/etc/uci-defaults/30_luci-theme-bootstrap
+# https://github.com/openwrt/luci/blob/openwrt-25.12/themes/luci-theme-bootstrap/root/etc/uci-defaults/30_luci-theme-bootstrap
+
+uci -q batch <<-EOF
+  set luci.themes.Oasisic=/luci-static/oasisic
+  commit luci
+EOF
+
+exit 0

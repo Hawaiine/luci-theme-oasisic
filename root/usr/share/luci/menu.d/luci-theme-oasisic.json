@@ -1,0 +1,12 @@
+{
+  "admin/applications/oasisic": {
+    "title": "Oasisic Theme",
+    "order": 99,
+    "action": {
+      "type": "firstchild"
+    },
+    "depends": {
+      "acl": [ "luci-app-oasisic-config" ]
+    }
+  }
+}

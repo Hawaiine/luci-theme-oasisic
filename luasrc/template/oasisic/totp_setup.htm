@@ -64,6 +64,9 @@ luci-theme-oasisic — TOTP 两步验证设置页面
 </div>
 
 <script src="<%=media%>/js/totp.js"></script>
-<script>OasisicTOTP.init();</script>
+<script>
+	var OASISIC_API_PATH = '<%=url("admin/oasisic")%>';
+	OasisicTOTP.init();
+</script>
 
 <%+footer%>

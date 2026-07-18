@@ -94,6 +94,10 @@
 	</div>
 
 	<script>
+		// API base path for custom login/TOTP endpoints
+		// Injected from server-side to avoid JavaScript global object confusion
+		// Reference: LuCI JS API uses L.env.cgi_base, but login page doesn't load luci.js
+		var OASISIC_API_PATH = '<%=url("admin/oasisic")%>';
 		OasisicLogin.init({
 			totpEnabled: <%= luci.sys.call("test -f /etc/oasisic/totp_enabled") == 0 and "true" or "false" %>,
 			totpAvailable: <%= luci.sys.call("command -v oathtool >/dev/null 2>&1") == 0 and "true" or "false" %>

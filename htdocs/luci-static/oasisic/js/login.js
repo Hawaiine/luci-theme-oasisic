@@ -97,7 +97,7 @@ var OasisicLogin = (function() {
     showLoading(true);
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', Luci.location.path + '/login_check', true);
+    xhr.open('POST', OASISIC_API_PATH + '/login_check', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
     xhr.onload = function() {
@@ -190,7 +190,7 @@ var OasisicLogin = (function() {
     if (btn) btn.disabled = true;
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', Luci.location.path + '/login_verify', true);
+    xhr.open('POST', OASISIC_API_PATH + '/login_verify', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
     xhr.onload = function() {
