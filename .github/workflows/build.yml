@@ -18,8 +18,12 @@ jobs:
           cd openwrt
           ./scripts/feeds update -a && ./scripts/feeds install -a
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
-          echo "CONFIG_LIBDEFLATE=n" >> .config
           make defconfig
+          # 禁用 libdeflate（host 编译时 libdeflate-gzip 不存在导致 tar 解压失败）
+          sed -i 's/CONFIG_LIBDEFLATE=y/CONFIG_LIBDEFLATE=n/' .config
+          # 禁用签名包（不需要私钥文件）
+          sed -i 's/CONFIG_SIGNED_PACKAGES=y/CONFIG_SIGNED_PACKAGES=n/' .config
+          make olddefconfig
           make package/luci-theme-oasisic/compile -j$(nproc) V=s
       - name: 上传
         uses: actions/upload-artifact@v7
