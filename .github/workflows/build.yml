@@ -19,12 +19,8 @@ jobs:
           ./scripts/feeds update -a && ./scripts/feeds install -a
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
           make defconfig
-          # 创建常用 host tools 软链（OpenWrt host 编译优先从 staging_dir/host/bin 找工具）
-          mkdir -p staging_dir/host/bin
-          for tool in libdeflate-gzip openssl sed grep gawk find xargs sort install cp mv rm mkdir touch cat echo printf false true tee uname which wc head tail cut tr od hexdump env basename dirname readlink realpath; do
-            src=$(command -v "$tool" 2>/dev/null || echo "/usr/bin/$tool")
-            [ -f "$src" ] && ln -sf "$src" "staging_dir/host/bin/$tool" 2>/dev/null || true
-          done
+          # 先编译 host tools（sed、libdeflate-gzip、openssl 等），避免后续 host 编译失败
+          make tools/compile -j$(nproc) 2>&1
           # 生成签名密钥（CONFIG_SIGNED_PACKAGES 需要 EC 私钥）
           openssl ecparam -genkey -name prime256v1 -out private-key.pem 2>/dev/null
           make package/luci-theme-oasisic/compile -j$(nproc) V=s 2>&1
