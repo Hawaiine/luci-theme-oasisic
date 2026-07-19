@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/openwrt/sdk:x86_64-25.12.5
+      options: --user root
     steps:
       - uses: actions/checkout@v7
       - name: 编译
