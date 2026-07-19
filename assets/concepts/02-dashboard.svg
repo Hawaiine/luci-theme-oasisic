@@ -1,0 +1,206 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="bgLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F5F7FA"/>
+      <stop offset="100%" stop-color="#EDF0F5"/>
+    </linearGradient>
+    <linearGradient id="sidebarGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#1A2332"/>
+    </linearGradient>
+    <linearGradient id="btnGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0066FF"/>
+      <stop offset="100%" stop-color="#0052CC"/>
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0066FF"/>
+      <stop offset="100%" stop-color="#00C9FF"/>
+    </linearGradient>
+    <linearGradient id="ringMem" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#34D399"/>
+    </linearGradient>
+    <linearGradient id="ringDisk" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+    <linearGradient id="cardShadow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(0,0,0,0.04)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.02)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="url(#bgLight)"/>
+
+  <!-- Sidebar -->
+  <rect x="0" y="0" width="220" height="720" fill="url(#sidebarGrad)"/>
+
+  <!-- Sidebar logo -->
+  <rect x="20" y="16" width="24" height="24" rx="6" fill="url(#btnGrad)"/>
+  <text x="52" y="34" fill="#fff" font-size="16" font-weight="700" letter-spacing="0.5">OASISIC</text>
+
+  <!-- Sidebar search -->
+  <rect x="14" y="56" width="192" height="32" rx="6" fill="rgba(255,255,255,0.06)"/>
+  <text x="30" y="76" fill="rgba(255,255,255,0.3)" font-size="12">🔍 搜索菜单...</text>
+
+  <!-- Sidebar menu items -->
+  <g font-size="13" fill="rgba(255,255,255,0.55)">
+    <g transform="translate(0, 108)">
+      <rect x="0" y="0" width="220" height="36" fill="rgba(0,102,255,0.12)"/>
+      <rect x="0" y="0" width="3" height="36" fill="#0066FF"/>
+      <text x="44" y="24" fill="#fff" font-weight="600">📊 仪表盘</text>
+    </g>
+    <g transform="translate(0, 148)">
+      <text x="44" y="24">🌐 网络</text>
+    </g>
+    <g transform="translate(0, 188)">
+      <text x="44" y="24">🛡️ 防火墙</text>
+    </g>
+    <g transform="translate(0, 228)">
+      <text x="44" y="24">📡 服务</text>
+      <text x="185" y="24" fill="rgba(255,255,255,0.2)">▸</text>
+    </g>
+    <g transform="translate(0, 268)">
+      <text x="44" y="24">⚙️ 系统</text>
+      <text x="185" y="24" fill="rgba(255,255,255,0.2)">▸</text>
+    </g>
+    <g transform="translate(0, 308)">
+      <text x="44" y="24">🔑 VPN</text>
+    </g>
+    <g transform="translate(0, 348)">
+      <text x="44" y="24">📦 软件包</text>
+    </g>
+  </g>
+
+  <!-- Sidebar bottom -->
+  <rect x="14" y="660" width="192" height="44" rx="8" fill="rgba(255,255,255,0.04)"/>
+  <text x="30" y="686" fill="rgba(255,255,255,0.5)" font-size="11">OpenWrt · 192.168.1.1</text>
+  <circle cx="185" cy="680" r="8" fill="rgba(255,255,255,0.08)"/>
+  <circle cx="185" cy="678" r="3" fill="#fff" opacity="0.3"/>
+
+  <!-- Main content area -->
+  <g transform="translate(240, 20)">
+
+    <!-- Header -->
+    <text x="0" y="20" fill="#1A1D23" font-size="20" font-weight="700">仪表盘</text>
+    <text x="0" y="40" fill="#64748B" font-size="12">设备状态概览 · 自动刷新 10s</text>
+
+    <!-- Status Bar -->
+    <g transform="translate(0, 60)">
+      <rect x="0" y="0" width="1020" height="64" rx="12" fill="#fff" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
+      <g transform="translate(24, 16)">
+        <text x="0" y="14" fill="#64748B" font-size="11">设备</text>
+        <text x="0" y="32" fill="#1A1D23" font-size="14" font-weight="600">OpenWrt Router</text>
+        <text x="200" y="14" fill="#64748B" font-size="11">运行时间</text>
+        <text x="200" y="32" fill="#1A1D23" font-size="14" font-weight="600">12d 7h 32m</text>
+        <text x="360" y="14" fill="#64748B" font-size="11">在线设备</text>
+        <text x="360" y="32" fill="#1A1D23" font-size="14" font-weight="600">8</text>
+        <text x="480" y="14" fill="#64748B" font-size="11">负载</text>
+        <text x="480" y="32" fill="#1A1D23" font-size="14" font-weight="600">0.25 / 0.18 / 0.12</text>
+      </g>
+      <!-- Status dots -->
+      <circle cx="975" cy="20" r="4" fill="#10B981"/>
+      <text x="960" y="48" fill="#10B981" font-size="10" text-anchor="end">运行正常</text>
+    </g>
+
+    <!-- Mini ring gauges row -->
+    <g transform="translate(0, 140)">
+      <!-- CPU -->
+      <rect x="0" y="0" width="240" height="100" rx="10" fill="#fff" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
+      <g transform="translate(120, 50)">
+        <circle cx="0" cy="0" r="28" fill="none" stroke="#E2E8F0" stroke-width="5"/>
+        <circle cx="0" cy="0" r="28" fill="none" stroke="url(#ringGrad)" stroke-width="5" stroke-dasharray="132 44" stroke-dashoffset="0" transform="rotate(-90)"/>
+        <text x="0" y="4" fill="#1A1D23" font-size="16" font-weight="700" text-anchor="middle">35%</text>
+      </g>
+      <text x="120" y="90" fill="#64748B" font-size="11" text-anchor="middle">CPU</text>
+
+      <!-- Memory -->
+      <rect x="255" y="0" width="240" height="100" rx="10" fill="#fff" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
+      <g transform="translate(375, 50)">
+        <circle cx="0" cy="0" r="28" fill="none" stroke="#E2E8F0" stroke-width="5"/>
+        <circle cx="0" cy="0" r="28" fill="none" stroke="url(#ringMem)" stroke-width="5" stroke-dasharray="106 70" stroke-dashoffset="0" transform="rotate(-90)"/>
+        <text x="0" y="4" fill="#1A1D23" font-size="16" font-weight="700" text-anchor="middle">62%</text>
+      </g>
+      <text x="375" y="90" fill="#64748B" font-size="11" text-anchor="middle">内存</text>
+
+      <!-- Disk -->
+      <rect x="510" y="0" width="240" height="100" rx="10" fill="#fff" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
+      <g transform="translate(630, 50)">
+        <circle cx="0" cy="0" r="28" fill="none" stroke="#E2E8F0" stroke-width="5"/>
+        <circle cx="0" cy="0" r="28" fill="none" stroke="url(#ringDisk)" stroke-width="5" stroke-dasharray="53 123" stroke-dashoffset="0" transform="rotate(-90)"/>
+        <text x="0" y="4" fill="#1A1D23" font-size="16" font-weight="700" text-anchor="middle">15%</text>
+      </g>
+      <text x="630" y="90" fill="#64748B" font-size="11" text-anchor="middle">存储</text>
+    </g>
+
+    <!-- Info cards grid -->
+    <g transform="translate(0, 260)">
+      <!-- System Info -->
+      <rect x="0" y="0" width="330" height="180" rx="10" fill="#fff" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
+      <text x="16" y="24" fill="#1A1D23" font-size="14" font-weight="600">系统信息</text>
+      <line x1="16" y1="34" x2="314" y2="34" stroke="#F1F5F9" stroke-width="1"/>
+      <g transform="translate(16, 50)" font-size="12">
+        <text x="0" y="0" fill="#64748B">固件版本</text><text x="160" y="0" fill="#1A1D23">OpenWrt 24.10.0</text>
+        <text x="0" y="24" fill="#64748B">内核版本</text><text x="160" y="24" fill="#1A1D23">6.6.73</text>
+        <text x="0" y="48" fill="#64748B">本地时间</text><text x="160" y="48" fill="#1A1D23">2026-07-13 15:33</text>
+        <text x="0" y="72" fill="#64748B">运行模式</text><text x="160" y="72" fill="#1A1D23">旁路网关</text>
+      </g>
+
+      <!-- Network Status -->
+      <rect x="345" y="0" width="330" height="180" rx="10" fill="#fff" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
+      <text x="16" y="24" fill="#1A1D23" font-size="14" font-weight="600">网络状态</text>
+      <line x1="16" y1="34" x2="314" y2="34" stroke="#F1F5F9" stroke-width="1"/>
+      <g transform="translate(16, 50)" font-size="12">
+        <text x="0" y="0" fill="#64748B">WAN IP</text><text x="160" y="0" fill="#1A1D23">100.64.x.x</text>
+        <text x="0" y="24" fill="#64748B">网关</text><text x="160" y="24" fill="#1A1D23">10.10.10.253</text>
+        <text x="0" y="48" fill="#64748B">DNS</text><text x="160" y="48" fill="#1A1D23">223.5.5.5 · 1.1.1.1</text>
+        <text x="0" y="72" fill="#64748B">IPv6</text><text x="160" y="72" fill="#10B981">已连接</text>
+      </g>
+
+      <!-- Nikki Status -->
+      <rect x="690" y="0" width="330" height="180" rx="10" fill="#fff" stroke="rgba(0,102,255,0.08)" stroke-width="1.5"/>
+      <!-- Nikki badge -->
+      <rect x="260" y="10" width="55" height="18" rx="4" fill="rgba(0,102,255,0.1)"/>
+      <text x="275" y="23" fill="#0066FF" font-size="10" font-weight="600">Nikki</text>
+      <text x="16" y="24" fill="#1A1D23" font-size="14" font-weight="600">代理状态</text>
+      <line x1="16" y1="34" x2="314" y2="34" stroke="#F1F5F9" stroke-width="1"/>
+      <g transform="translate(16, 50)" font-size="12">
+        <text x="0" y="0" fill="#64748B">代理模式</text>
+        <rect x="120" y="-8" width="50" height="20" rx="4" fill="rgba(16,185,129,0.1)"/>
+        <text x="130" y="6" fill="#10B981" font-size="11" font-weight="600">规则</text>
+        <text x="0" y="24" fill="#64748B">节点延迟</text><text x="160" y="24" fill="#1A1D23">🇯🇵 AWS-JP 42ms</text>
+        <text x="0" y="48" fill="#64748B">今日流量</text><text x="160" y="48" fill="#1A1D23">↑ 128MB ↓ 1.2GB</text>
+        <text x="0" y="72" fill="#64748B">运行状态</text>
+        <circle cx="160" cy="68" r="3" fill="#10B981"/>
+        <text x="168" y="72" fill="#10B981">运行中</text>
+      </g>
+    </g>
+
+    <!-- Sparkline row -->
+    <g transform="translate(0, 460)">
+      <rect x="0" y="0" width="510" height="100" rx="10" fill="#fff" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
+      <text x="16" y="24" fill="#1A1D23" font-size="14" font-weight="600">接口流量</text>
+      <!-- Mini sparkline -->
+      <polyline points="40,70 60,68 80,72 100,60 120,55 140,58 160,50 180,45 200,48 220,40 240,42 260,38 280,35 300,30 320,32 340,28 360,25 380,20 400,22 420,18 440,15 460,18 480,12" fill="none" stroke="#0066FF" stroke-width="2" opacity="0.8"/>
+      <polyline points="40,80 60,78 80,75 100,72 120,70 140,68 160,65 180,62 200,60 220,58 240,55 260,52 280,50 300,48 320,45 340,42 360,40 380,38 400,35 420,32 440,30 460,28 480,25" fill="none" stroke="#10B981" stroke-width="1.5" opacity="0.6"/>
+      <text x="40" y="90" fill="#64748B" font-size="10">下行</text><text x="80" y="90" fill="#0066FF" font-size="10" font-weight="600">12.5 MB/s</text>
+      <text x="180" y="90" fill="#64748B" font-size="10">上行</text><text x="220" y="90" fill="#10B981" font-size="10" font-weight="600">2.3 MB/s</text>
+    </g>
+
+    <!-- DHCP leases -->
+    <g transform="translate(525, 460)">
+      <rect x="0" y="0" width="495" height="100" rx="10" fill="#fff" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
+      <text x="16" y="24" fill="#1A1D23" font-size="14" font-weight="600">活跃客户端</text>
+      <g transform="translate(16, 42)" font-size="11">
+        <text x="0" y="0" fill="#64748B">192.168.1.100</text><text x="140" y="0" fill="#1A1D23">台式机</text><text x="280" y="0" fill="#10B981">●</text>
+        <text x="0" y="20" fill="#64748B">192.168.1.101</text><text x="140" y="20" fill="#1A1D23">iPhone</text><text x="280" y="20" fill="#10B981">●</text>
+        <text x="0" y="40" fill="#64748B">192.168.1.102</text><text x="140" y="40" fill="#1A1D23">MacBook</text><text x="280" y="40" fill="#10B981">●</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Label -->
+  <rect x="20" y="680" width="165" height="24" rx="4" fill="rgba(0,102,255,0.15)"/>
+  <text x="102" y="696" fill="#0066FF" font-size="12" font-weight="600" text-anchor="middle">📊 仪表盘首页概念</text>
+</svg>

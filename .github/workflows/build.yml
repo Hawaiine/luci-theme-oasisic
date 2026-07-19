@@ -19,6 +19,10 @@ jobs:
           ./scripts/feeds update -a && ./scripts/feeds install -a
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
           make defconfig
+          # 创建 tools 软链到 staging_dir/host/bin（Host 编译需要，但系统可能未安装 OpenWrt 自编译版本）
+          mkdir -p staging_dir/host/bin
+          ln -sf /usr/bin/libdeflate-gzip staging_dir/host/bin/libdeflate-gzip 2>/dev/null || true
+          ln -sf /usr/bin/openssl staging_dir/host/bin/openssl 2>/dev/null || true
           # 生成签名密钥（CONFIG_SIGNED_PACKAGES 需要 EC 私钥）
           openssl ecparam -genkey -name prime256v1 -out private-key.pem 2>/dev/null
           make package/luci-theme-oasisic/compile -j$(nproc) V=s 2>&1

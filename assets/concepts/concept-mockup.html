@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>luci-theme-oasisic — 概念设计</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    padding: 40px;
+  }
+  .container { max-width: 1400px; margin: 0 auto; }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .subtitle { color: #86868b; font-size: 15px; margin-bottom: 40px; }
+
+  .concept-grid { display: flex; flex-direction: column; gap: 48px; }
+
+  /* Concept Card */
+  .concept-card {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+  }
+  .concept-header {
+    padding: 20px 28px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .concept-header .badge {
+    background: #007aff;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+  .concept-header h2 { font-size: 16px; font-weight: 600; }
+  .concept-body { padding: 28px; }
+
+  /* ===== LOGIN PAGE ===== */
+  .login-mock {
+    width: 100%;
+    height: 500px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .login-mock::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(0,122,255,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(0,122,255,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, rgba(100,100,255,0.05) 0%, transparent 50%);
+  }
+  .login-card {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 40px;
+  }
+  .login-card .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+  .login-card .logo-icon {
+    width: 32px; height: 32px;
+    background: #007aff;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 16px;
+  }
+  .login-card .logo-text {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .login-card h3 {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .login-card .hint {
+    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+  .login-card .field {
+    margin-bottom: 14px;
+  }
+  .login-card .field input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .login-card .field input::placeholder { color: rgba(255,255,255,0.3); }
+  .login-card .field input:focus { border-color: rgba(0,122,255,0.5); }
+  .login-card .actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 18px 0 24px;
+  }
+  .login-card .actions label {
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .login-card .actions .passkey-badge {
+    color: #007aff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    background: rgba(0,122,255,0.12);
+    border-radius: 20px;
+    cursor: default;
+  }
+  .login-card .btn-login {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: #007aff;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: default;
+    margin-bottom: 12px;
+  }
+  .login-card .btn-2fa {
+    width: 100%;
+    text-align: center;
+    color: rgba(255,255,255,0.35);
+    font-size: 12px;
+    background: none;
+    border: none;
+    cursor: default;
+  }
+  .login-card .footer {
+    text-align: center;
+    color: rgba(255,255,255,0.15);
+    font-size: 11px;
+    margin-top: 28px;
+  }
+
+  /* ===== DASHBOARD ===== */
+  .dash-mock {
+    display: flex;
+    gap: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    min-height: 520px;
+    background: #fff;
+  }
+  /* Sidebar */
+  .dash-sidebar {
+    width: 220px;
+    background: #1d1d1f;
+    padding: 20px 0;
+    flex-shrink: 0;
+  }
+  .dash-sidebar .logo {
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .dash-sidebar .logo-box {
+    width: 28px; height: 28px;
+    background: #007aff;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 14px;
+  }
+  .dash-sidebar .logo-name { color: #fff; font-size: 15px; font-weight: 600; }
+  .dash-sidebar .menu-item {
+    padding: 10px 20px;
+    color: rgba(255,255,255,0.45);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: default;
+    transition: all 0.15s;
+  }
+  .dash-sidebar .menu-item.active {
+    color: #fff;
+    background: rgba(0,122,255,0.12);
+    border-left: 3px solid #007aff;
+    padding-left: 17px;
+  }
+  .dash-sidebar .menu-item:hover { color: rgba(255,255,255,0.7); }
+  .dash-sidebar .section-label {
+    padding: 16px 20px 6px;
+    color: rgba(255,255,255,0.2);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .dash-sidebar .bottom {
+    margin-top: auto;
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .dash-sidebar .bottom .device {
+    color: rgba(255,255,255,0.3);
+    font-size: 11px;
+  }
+  /* Main area */
+  .dash-main {
+    flex: 1;
+    padding: 24px;
+    background: #f5f5f7;
+  }
+  .dash-main .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  .dash-main .dash-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1d1d1f;
+  }
+  .dash-main .dash-header .refresh {
+    font-size: 12px;
+    color: #86868b;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid #e8e8ed;
+  }
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .status-item {
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px 18px;
+    flex: 1;
+    border: 1px solid #f0f0f0;
+  }
+  .status-item .label {
+    font-size: 11px;
+    color: #86868b;
+    margin-bottom: 4px;
+  }
+  .status-item .value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d1d1f;
+  }
+  .status-item .value .dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #30d158;
+    margin-right: 6px;
+  }
+  /* Cards grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .dash-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px;
+    border: 1px solid #f0f0f0;
+  }
+  .dash-card .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 12px;
+  }
+  .dash-card .card-label {
+    font-size: 11px;
+    color: #86868b;
+    margin-bottom: 2px;
+  }
+  .dash-card .card-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1d1d1f;
+    margin-bottom: 8px;
+  }
+  .dash-card .card-value.green { color: #30d158; }
+  .dash-card .card-value.blue { color: #007aff; }
+  .dash-card.nikki {
+    border-color: rgba(0,122,255,0.15);
+    background: linear-gradient(135deg, rgba(0,122,255,0.03), transparent);
+  }
+  .dash-card .nikki-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    color: #007aff;
+    background: rgba(0,122,255,0.08);
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  /* Ring gauges */
+  .gauge-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .gauge-card {
+    flex: 1;
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px;
+    border: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .gauge-ring {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .gauge-ring svg { transform: rotate(-90deg); }
+  .gauge-ring .pct {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1d1d1f;
+  }
+  .gauge-info .gauge-label { font-size: 12px; color: #86868b; }
+  .gauge-info .gauge-detail { font-size: 13px; font-weight: 500; color: #1d1d1f; }
+  /* Chart area */
+  .chart-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px;
+    border: 1px solid #f0f0f0;
+    margin-bottom: 12px;
+  }
+  .chart-card .chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .chart-vis {
+    height: 60px;
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+  }
+  .chart-bar {
+    flex: 1;
+    background: linear-gradient(to top, #007aff, #40b4ff);
+    border-radius: 2px 2px 0 0;
+    min-height: 4px;
+    opacity: 0.7;
+    transition: height 0.3s;
+  }
+  .chart-bar:nth-child(even) { opacity: 0.5; }
+  .chart-bar.down { background: linear-gradient(to top, #30d158, #63e6a0); }
+  .chart-legend {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+    font-size: 11px;
+    color: #86868b;
+  }
+  .chart-legend span b { color: #1d1d1f; }
+
+  /* ===== Login separator ===== */
+  .separator { text-align: center; color: #86868b; font-size: 13px; padding: 8px 0; }
+
+  /* Page Label */
+  .page-label {
+    display: inline-block;
+    background: rgba(0,122,255,0.08);
+    color: #007aff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-top: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🏝️ luci-theme-oasisic</h1>
+  <div class="subtitle">概念设计 — Apple 极简风格 × 探针面板数据展示</div>
+
+  <div class="concept-grid">
+
+    <!-- ====== LOGIN PAGE ====== -->
+    <div class="concept-card">
+      <div class="concept-header">
+        <span class="badge">1</span>
+        <h2>🔐 登录页 — Apple 风格毛玻璃</h2>
+      </div>
+      <div class="concept-body" style="padding:0">
+        <div class="login-mock">
+          <div class="login-card">
+            <div class="logo">
+              <div class="logo-icon">O</div>
+              <span class="logo-text">OASISIC</span>
+            </div>
+            <h3>欢迎回来</h3>
+            <div class="hint">登录以管理您的路由器</div>
+            <div class="field"><input type="text" placeholder="用户名" value="admin" style="color:rgba(255,255,255,0.8)"></div>
+            <div class="field"><input type="password" placeholder="密码"></div>
+            <div class="actions">
+              <label><input type="checkbox" checked style="accent-color:#007aff"> 记住我</label>
+              <span class="passkey-badge">↩ Passkey</span>
+            </div>
+            <button class="btn-login">登录</button>
+            <button class="btn-2fa">两步验证 2FA</button>
+            <div class="footer">v1.0.0 · OpenWrt LuCI</div>
+          </div>
+        </div>
+        <div style="padding: 12px 28px 16px; border-top:1px solid #f0f0f0;">
+          <span class="page-label">深色渐变背景 · 毛玻璃卡片 · Passkey/2FA · 极简表单</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== DASHBOARD ====== -->
+    <div class="concept-card">
+      <div class="concept-header">
+        <span class="badge">2</span>
+        <h2>📊 仪表盘 — 探针风格系统概览 + Nikki 状态</h2>
+      </div>
+      <div class="concept-body" style="padding:0">
+        <div class="dash-mock">
+          <!-- Sidebar -->
+          <div class="dash-sidebar" style="display:flex; flex-direction:column;">
+            <div>
+              <div class="logo">
+                <div class="logo-box">O</div>
+                <span class="logo-name">OASISIC</span>
+              </div>
+              <div class="section-label">状态</div>
+              <div class="menu-item active">📊 仪表盘</div>
+              <div class="menu-item">📡 概览</div>
+              <div class="menu-item">📈 实时流量</div>
+              <div class="section-label">网络</div>
+              <div class="menu-item">🌐 接口</div>
+              <div class="menu-item">📶 无线</div>
+              <div class="menu-item">🛡️ 防火墙</div>
+              <div class="section-label">服务</div>
+              <div class="menu-item">⚡ Nikki</div>
+            </div>
+            <div class="bottom">
+              <div class="device">OpenWrt 24.10 · 192.168.1.1</div>
+            </div>
+          </div>
+          <!-- Main -->
+          <div class="dash-main">
+            <div class="dash-header">
+              <div>
+                <h2>仪表盘</h2>
+                <div style="font-size:12px; color:#86868b; margin-top:2px;">自动刷新 · 10s</div>
+              </div>
+              <div class="refresh">⚙️</div>
+            </div>
+
+            <!-- Status bar -->
+            <div class="status-bar">
+              <div class="status-item">
+                <div class="label">设备</div>
+                <div class="value">OpenWrt 旁路</div>
+              </div>
+              <div class="status-item">
+                <div class="label">运行时间</div>
+                <div class="value">12d 7h 32m</div>
+              </div>
+              <div class="status-item">
+                <div class="label">在线设备</div>
+                <div class="value">8</div>
+              </div>
+              <div class="status-item">
+                <div class="label">系统负载</div>
+                <div class="value">0.25 / 0.18 / 0.12</div>
+              </div>
+              <div class="status-item">
+                <div class="label">状态</div>
+                <div class="value"><span class="dot"></span>运行正常</div>
+              </div>
+            </div>
+
+            <!-- Gauges -->
+            <div class="gauge-row">
+              <div class="gauge-card">
+                <div class="gauge-ring">
+                  <svg width="56" height="56" viewBox="0 0 56 56">
+                    <circle cx="28" cy="28" r="24" fill="none" stroke="#e8e8ed" stroke-width="4"/>
+                    <circle cx="28" cy="28" r="24" fill="none" stroke="#007aff" stroke-width="4" stroke-dasharray="113 38" stroke-dashoffset="0" stroke-linecap="round"/>
+                  </svg>
+                  <div class="pct">35%</div>
+                </div>
+                <div class="gauge-info">
+                  <div class="gauge-label">CPU</div>
+                  <div class="gauge-detail">Intel Celeron N5105</div>
+                </div>
+              </div>
+              <div class="gauge-card">
+                <div class="gauge-ring">
+                  <svg width="56" height="56" viewBox="0 0 56 56">
+                    <circle cx="28" cy="28" r="24" fill="none" stroke="#e8e8ed" stroke-width="4"/>
+                    <circle cx="28" cy="28" r="24" fill="none" stroke="#30d158" stroke-width="4" stroke-dasharray="94 57" stroke-dashoffset="0" stroke-linecap="round"/>
+                  </svg>
+                  <div class="pct">62%</div>
+                </div>
+                <div class="gauge-info">
+                  <div class="gauge-label">内存</div>
+                  <div class="gauge-detail">5.0 GB / 8.0 GB</div>
+                </div>
+              </div>
+              <div class="gauge-card">
+                <div class="gauge-ring">
+                  <svg width="56" height="56" viewBox="0 0 56 56">
+                    <circle cx="28" cy="28" r="24" fill="none" stroke="#e8e8ed" stroke-width="4"/>
+                    <circle cx="28" cy="28" r="24" fill="none" stroke="#ff9f0a" stroke-width="4" stroke-dasharray="45 106" stroke-dashoffset="0" stroke-linecap="round"/>
+                  </svg>
+                  <div class="pct">15%</div>
+                </div>
+                <div class="gauge-info">
+                  <div class="gauge-label">存储</div>
+                  <div class="gauge-detail">3.2 GB / 21.4 GB</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Info cards -->
+            <div class="cards-grid">
+              <div class="dash-card">
+                <div class="card-title">系统信息</div>
+                <div class="card-label">固件版本</div>
+                <div class="card-value">OpenWrt 24.10.0</div>
+                <div class="card-label">内核</div>
+                <div class="card-value">Linux 6.6.73</div>
+                <div class="card-label">本地时间</div>
+                <div class="card-value">2026-07-13 15:33</div>
+              </div>
+              <div class="dash-card">
+                <div class="card-title">网络状态</div>
+                <div class="card-label">WAN IP</div>
+                <div class="card-value">100.64.x.x</div>
+                <div class="card-label">默认网关</div>
+                <div class="card-value">10.10.10.253</div>
+                <div class="card-label">DNS</div>
+                <div class="card-value">223.5.5.5 · 1.1.1.1</div>
+              </div>
+              <div class="dash-card nikki">
+                <div class="card-title">Nikki 代理 <span class="nikki-tag">运行中</span></div>
+                <div class="card-label">代理模式</div>
+                <div class="card-value blue">规则</div>
+                <div class="card-label">节点延迟</div>
+                <div class="card-value green">🇯🇵 AWS-JP · 42ms</div>
+                <div class="card-label">今日流量</div>
+                <div class="card-value">↑ 128MB · ↓ 1.2GB</div>
+              </div>
+            </div>
+
+            <!-- Traffic chart -->
+            <div class="chart-card">
+              <div class="chart-title">接口流量</div>
+              <div class="chart-vis" id="chart1"></div>
+              <div class="chart-legend">
+                <span>⬇ 下行 <b>12.5 MB/s</b></span>
+                <span>⬆ 上行 <b>2.3 MB/s</b></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="padding: 12px 28px 16px; border-top:1px solid #f0f0f0;">
+          <span class="page-label">暗色侧栏 · 轻量内容区 · 环形进度条 · Nikki 专属卡片 · 流量图</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script>
+  // Generate chart bars
+  const bars = [35,42,28,55,48,60,52,38,45,58,62,50,44,36,52,68,72,60,48,42,55,65,58,50,45,38,52,60,55,48];
+  const chart1 = document.getElementById('chart1');
+  bars.forEach((h, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'chart-bar' + (i % 2 === 1 ? ' down' : '');
+    bar.style.height = (h * 0.7 + 8) + 'px';
+    chart1.appendChild(bar);
+  });
+</script>
+</body>
+</html>

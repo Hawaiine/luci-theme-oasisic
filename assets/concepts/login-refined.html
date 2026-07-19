@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>luci-theme-oasisic — 登录页精修</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    padding: 32px;
+    display: flex;
+    justify-content: center;
+  }
+  .container { max-width: 1000px; width: 100%; }
+
+  .page-title { font-size: 22px; font-weight: 700; margin-bottom: 2px; letter-spacing: -0.5px; }
+  .page-sub { color: #86868b; font-size: 13px; margin-bottom: 32px; }
+
+  /* ===== LOGIN PAGE — Apple Refined ===== */
+  .login-wrapper {
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.06);
+    margin-bottom: 24px;
+  }
+  .login-frame {
+    position: relative;
+    aspect-ratio: 16/10;
+    background: #000;
+  }
+  .login-frame .bg-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .login-frame .overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.30) 100%);
+  }
+
+  /* Apple-style glass card */
+  .login-card {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 376px;
+    background: rgba(0,0,0,0.40);
+    backdrop-filter: blur(80px) saturate(1.2);
+    -webkit-backdrop-filter: blur(80px) saturate(1.2);
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 40px 32px 32px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.30);
+  }
+
+  /* Logo — Apple style: clean, minimal */
+  .login-card .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+  .login-card .brand-mark {
+    width: 28px; height: 28px;
+    background: #0071e3;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1;
+  }
+  .login-card .brand-name {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    line-height: 1;
+  }
+
+  /* Greeting — Apple: tight, crisp */
+  .login-card h3 {
+    color: #fff;
+    font-size: 21px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
+    line-height: 1.15;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.25);
+  }
+  .login-card .hint {
+    color: rgba(255,255,255,0.55);
+    font-size: 14px;
+    margin-bottom: 28px;
+    letter-spacing: -0.1px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+
+  /* Apple-style inputs — no icons, clean borders */
+  .login-card .fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .login-card .fields input {
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.20);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 400;
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    letter-spacing: -0.1px;
+  }
+  .login-card .fields input::placeholder {
+    color: rgba(255,255,255,0.30);
+    font-weight: 400;
+  }
+  .login-card .fields input:focus {
+    border-color: rgba(0,113,227,0.5);
+    background: rgba(0,0,0,0.30);
+    box-shadow: 0 0 0 3px rgba(0,113,227,0.15);
+  }
+
+  /* Options row — Apple clean spacing */
+  .login-card .options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+  }
+  .login-card .options label {
+    color: rgba(255,255,255,0.45);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: default;
+    letter-spacing: -0.1px;
+  }
+  .login-card .options input[type="checkbox"] {
+    width: 15px; height: 15px;
+    accent-color: #0071e3;
+    border-radius: 3px;
+  }
+  .login-card .passkey {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 30px;
+    border: 0.5px solid rgba(255,255,255,0.15);
+    letter-spacing: -0.1px;
+    backdrop-filter: blur(10px);
+  }
+
+  /* Button — Apple blue */
+  .login-card .btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: default;
+    transition: all 0.2s;
+    font-family: inherit;
+    letter-spacing: -0.1px;
+  }
+  .login-card .btn-primary {
+    background: #0071e3;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .login-card .btn-ghost {
+    background: transparent;
+    color: rgba(255,255,255,0.30);
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  /* Footer — Apple: tiny, unobtrusive */
+  .login-card .footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 28px;
+    color: rgba(255,255,255,0.12);
+    font-size: 10px;
+    letter-spacing: 0.2px;
+  }
+  .login-card .footer .ver {
+    color: rgba(255,255,255,0.08);
+    font-weight: 500;
+  }
+
+  /* Wallpaper indicator — subtle */
+  .wallpaper-credit {
+    position: absolute;
+    bottom: 16px;
+    right: 20px;
+    color: rgba(255,255,255,0.15);
+    font-size: 10px;
+    background: rgba(0,0,0,0.20);
+    padding: 3px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    letter-spacing: 0.1px;
+  }
+
+  /* Changelog / diff */
+  .diff-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px 28px;
+    border: 1px solid #e8e8ed;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .diff-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: #1d1d1f;
+  }
+  .diff-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .diff-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 10px 12px;
+    background: #f5f5f7;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #515154;
+  }
+  .diff-item .badge {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .diff-item .badge.before { background: #fce8e6; color: #c5221f; }
+  .diff-item .badge.after { background: #e6f4ea; color: #137333; }
+  .diff-item strong { color: #1d1d1f; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page-title">🏝️ luci-theme-oasisic</div>
+  <div class="page-sub">登录页精修 — Apple 设计语言</div>
+
+  <div class="login-wrapper">
+    <div class="login-frame">
+      <img class="bg-img" src="https://picsum.photos/seed/oasisic-final/1600/1000" alt="">
+      <div class="overlay"></div>
+
+      <div class="login-card">
+        <!-- Logo: 简洁品牌，去掉多余副标题 -->
+        <div class="brand">
+          <div class="brand-mark">O</div>
+          <span class="brand-name">OASISIC</span>
+        </div>
+
+        <!-- Greeting: 干净的两行 -->
+        <h3>欢迎回来</h3>
+        <div class="hint">登录以管理您的旁路网关</div>
+
+        <!-- Inputs: 无图标干扰，纯文字描述 -->
+        <div class="fields">
+          <div><input type="text" placeholder="用户名" value="admin" style="color:rgba(255,255,255,0.85)"></div>
+          <div><input type="password" placeholder="密码"></div>
+        </div>
+
+        <!-- Options: 紧凑对齐 -->
+        <div class="options">
+          <label><input type="checkbox" checked> 记住我</label>
+          <span class="passkey">↩ Passkey</span>
+        </div>
+
+        <button class="btn btn-primary">登录</button>
+        <button class="btn btn-ghost">两步验证 2FA</button>
+
+        <!-- Footer: 极简版本号 -->
+        <div class="footer">
+          <span>luci-theme-oasisic</span>
+          <span class="ver">v1.0.0</span>
+        </div>
+      </div>
+
+      <div class="wallpaper-credit">Bing 每日壁纸 · 6h 自动更换</div>
+    </div>
+  </div>
+
+  <!-- 改进对比 -->
+  <div class="diff-card">
+    <h3>✏️ 根据你画圈的位置做的改进</h3>
+    <div class="diff-grid">
+      <div class="diff-item">
+        <span class="badge after">1</span>
+        <div><strong>Logo 区域</strong> — 去掉 "Oasisic OpenWrt" 副标题，改为纯品牌展示。Apple 风格：一个品牌标记 + 品牌名就够了，不堆叠信息。</div>
+      </div>
+      <div class="diff-item">
+        <span class="badge after">2</span>
+        <div><strong>输入框</strong> — 去掉 👤🔒 emoji 图标。Apple 从不在输入框里放图标干扰，只用干净的占位文字。输入框加了聚焦蓝色光晕。</div>
+      </div>
+      <div class="diff-item">
+        <span class="badge after">3</span>
+        <div><strong>版本号</strong> — 从长文本改为极简两段式：<code>luci-theme-oasisic</code> + 浅色 <code>v1.0.0</code>。颜色降到几乎不可见，不喧宾夺主。</div>
+      </div>
+      <div class="diff-item">
+        <span class="badge after">4</span>
+        <div><strong>全局优化</strong> — 卡片圆角 24px、毛玻璃强度 blur(80px)、主色改为 Apple Blue <code>#0071e3</code>、整体缩小到 376px 更精致居中。</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

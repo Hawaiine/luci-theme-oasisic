@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>luci-theme-oasisic — 旁路模式适配</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    padding: 32px;
+  }
+  .page-title { font-size: 24px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.3px; }
+  .page-sub { color: #86868b; font-size: 14px; margin-bottom: 32px; }
+
+  /* Login page */
+  .login-wrapper {
+    border-radius: 18px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 32px;
+  }
+  .login-frame {
+    position: relative;
+    aspect-ratio: 16/9;
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+  }
+  .login-frame .bg-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .login-frame .overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.35) 100%);
+  }
+  .login-card {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(400px, 85%);
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(60px) saturate(1.2);
+      -webkit-backdrop-filter: blur(60px) saturate(1.2);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 36px 32px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+    .login-card h3 {
+      color: #fff;
+      font-size: 22px; font-weight: 700;
+      margin-bottom: 4px; letter-spacing: -0.3px;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+    .login-card .hint {
+      color: rgba(255,255,255,0.6); font-size: 14px;
+      margin-bottom: 24px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .login-card .field input {
+      width: 100%;
+      padding: 13px 16px 13px 40px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(0,0,0,0.25);
+      color: #fff; font-size: 14px; outline: none;
+    }
+  }
+  .login-card .logo {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 24px;
+  }
+  .login-card .logo-icon {
+    width: 30px; height: 30px;
+    background: #007aff;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 15px;
+  }
+  .login-card .logo-text {
+    color: #fff; font-size: 17px; font-weight: 700; letter-spacing: -0.3px;
+  }
+  .login-card .logo-tag {
+    color: rgba(255,255,255,0.25); font-size: 10px;
+    padding: 2px 8px; border-radius: 4px;
+    background: rgba(255,255,255,0.05);
+    margin-left: auto;
+  }
+  .login-card .hint {
+    color: rgba(255,255,255,0.5); font-size: 14px;
+    margin-bottom: 24px;
+  }
+  .login-card .field-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .login-card .field input {
+    width: 100%;
+    padding: 13px 16px 13px 40px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.25);
+    color: #fff; font-size: 14px; outline: none;
+  }
+  .login-card .field input::placeholder { color: rgba(255,255,255,0.3); }
+  .login-card .field input:focus { border-color: rgba(0,122,255,0.5); }
+  .login-card .field .icon {
+    position: absolute; left: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.3); font-size: 14px;
+  }
+  .login-card .options {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .login-card .options label {
+    color: rgba(255,255,255,0.5); font-size: 13px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .login-card .options input[type="checkbox"] { width: 16px; height: 16px; accent-color: #007aff; }
+  .login-card .passkey {
+    color: #007aff; font-size: 12px; font-weight: 500;
+    padding: 5px 14px;
+    background: rgba(0,122,255,0.12);
+    border-radius: 20px;
+    border: 1px solid rgba(0,122,255,0.15);
+  }
+  .login-card .btn {
+    width: 100%; padding: 13px; border-radius: 12px; border: none;
+    font-size: 15px; font-weight: 600; cursor: default;
+  }
+  .login-card .btn-primary { background: #007aff; color: #fff; margin-bottom: 10px; }
+  .login-card .btn-ghost { background: transparent; color: rgba(255,255,255,0.35); font-size: 12px; font-weight: 400; }
+  .login-card .footer {
+    text-align: center; color: rgba(255,255,255,0.15); font-size: 11px;
+    margin-top: 24px;
+  }
+
+  /* Dashboard */
+  .dash-wrapper {
+    border-radius: 18px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    background: #fff;
+    margin-bottom: 24px;
+  }
+  .dash-layout {
+    display: flex;
+    min-height: 560px;
+  }
+  .dash-sidebar {
+    width: 220px;
+    background: #1d1d1f;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .dash-sidebar .logo {
+    padding: 0 20px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 24px;
+  }
+  .dash-sidebar .logo-box {
+    width: 28px; height: 28px;
+    background: #007aff;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 14px;
+  }
+  .dash-sidebar .logo-name { color: #fff; font-size: 14px; font-weight: 600; }
+  .dash-sidebar .logo-mode {
+    color: rgba(255,255,255,0.25); font-size: 10px;
+    margin-left: auto;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(0,122,255,0.12);
+  }
+  .dash-sidebar .section-label {
+    padding: 16px 20px 6px;
+    color: rgba(255,255,255,0.2);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .dash-sidebar .menu-item {
+    padding: 10px 20px;
+    color: rgba(255,255,255,0.45);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: default;
+  }
+  .dash-sidebar .menu-item.active {
+    color: #fff;
+    background: rgba(0,122,255,0.12);
+    border-left: 3px solid #007aff;
+    padding-left: 17px;
+  }
+  .dash-sidebar .bottom {
+    margin-top: auto;
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .dash-sidebar .bottom .device { color: rgba(255,255,255,0.3); font-size: 11px; }
+  .dash-sidebar .bottom .role { color: #30d158; font-size: 10px; margin-top: 2px; }
+
+  /* Main content */
+  .dash-main {
+    flex: 1;
+    padding: 24px;
+    background: #f5f5f7;
+  }
+  .dash-main .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .dash-main .dash-header h2 { font-size: 20px; font-weight: 700; }
+  .dash-main .dash-header .mode-badge {
+    font-size: 11px; padding: 4px 14px;
+    border-radius: 20px;
+    background: rgba(0,122,255,0.08);
+    color: #007aff;
+    font-weight: 500;
+  }
+  .dash-main .dash-header .meta { font-size: 12px; color: #86868b; margin-top: 2px; }
+
+  /* Status bar - bypass mode */
+  .status-bar {
+    display: flex; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .status-item {
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px 16px;
+    flex: 1;
+    border: 1px solid #f0f0f0;
+  }
+  .status-item .label { font-size: 11px; color: #86868b; margin-bottom: 3px; }
+  .status-item .value { font-size: 14px; font-weight: 600; color: #1d1d1f; }
+  .status-item .value .dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #30d158;
+    margin-right: 5px;
+  }
+
+  /* Gauges */
+  .gauge-row {
+    display: flex; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .gauge-card {
+    flex: 1;
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .gauge-ring { width: 48px; height: 48px; position: relative; flex-shrink: 0; }
+  .gauge-ring svg { transform: rotate(-90deg); }
+  .gauge-ring .pct {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #1d1d1f;
+  }
+  .gauge-info .gauge-label { font-size: 11px; color: #86868b; }
+  .gauge-info .gauge-detail { font-size: 12px; font-weight: 500; color: #1d1d1f; }
+
+  /* Cards grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .dash-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #f0f0f0;
+  }
+  .dash-card .card-title {
+    font-size: 12px; font-weight: 600; color: #1d1d1f;
+    margin-bottom: 10px;
+  }
+  .dash-card .card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 0;
+    font-size: 12px;
+  }
+  .dash-card .card-row .lbl { color: #86868b; }
+  .dash-card .card-row .val { color: #1d1d1f; font-weight: 500; }
+  .dash-card .card-row .val.green { color: #30d158; }
+  .dash-card .card-row .val.blue { color: #007aff; }
+  .dash-card .card-row .val.orange { color: #ff9f0a; }
+  .dash-card.nikki {
+    border-color: rgba(0,122,255,0.15);
+    background: linear-gradient(135deg, rgba(0,122,255,0.03), transparent);
+    position: relative;
+  }
+  .dash-card.nikki .badge {
+    position: absolute;
+    top: 14px; right: 14px;
+    font-size: 9px; font-weight: 600;
+    color: #fff;
+    background: #007aff;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  /* Topology */
+  .topo-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #f0f0f0;
+    margin-bottom: 10px;
+  }
+  .topo-card .topo-title { font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+  .topo-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+  }
+  .topo-node {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+  }
+  .topo-node.routeros { background: #f0f0f0; color: #1d1d1f; }
+  .topo-node.openwrt {
+    background: rgba(0,122,255,0.1);
+    color: #007aff;
+    border: 1px solid rgba(0,122,255,0.2);
+  }
+  .topo-node.device { background: #f5f5f7; color: #86868b; }
+  .topo-arrow { color: #d2d2d7; font-size: 14px; }
+  .topo-note { font-size: 10px; color: #86868b; margin-top: 6px; }
+
+  /* Traffic chart */
+  .chart-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #f0f0f0;
+  }
+  .chart-card .chart-title { font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+  .chart-vis { display: flex; align-items: flex-end; gap: 3px; height: 50px; }
+  .chart-bar {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    min-height: 3px;
+  }
+  .chart-bar.down { background: linear-gradient(to top, #007aff, #40b4ff); opacity: 0.7; }
+  .chart-bar.up { background: linear-gradient(to top, #30d158, #63e6a0); opacity: 0.5; }
+  .chart-legend {
+    display: flex; gap: 16px; margin-top: 8px;
+    font-size: 11px; color: #86868b;
+  }
+  .chart-legend span b { color: #1d1d1f; }
+
+  /* Analysis section */
+  .analysis {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid #e8e8ed;
+    margin-top: 24px;
+  }
+  .analysis h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+  .analysis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .analysis-item {
+    padding: 14px;
+    background: #f5f5f7;
+    border-radius: 10px;
+  }
+  .analysis-item h4 { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .analysis-item p { font-size: 12px; color: #515154; line-height: 1.5; }
+  .analysis-item .tag {
+    display: inline-block;
+    font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px;
+    margin-top: 6px;
+  }
+  .tag-adapt { background: rgba(0,122,255,0.08); color: #007aff; }
+  .tag-auto { background: rgba(48,209,88,0.08); color: #30d158; }
+</style>
+</head>
+<body>
+
+<div class="page-title">🏝️ luci-theme-oasisic</div>
+<div class="page-sub">Oasisic OpenWrt · 旁路模式适配方案</div>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div class="login-wrapper">
+  <div class="login-frame">
+    <img class="bg-img" src="https://picsum.photos/seed/oasisic-brand/1600/900" alt="">
+    <div class="overlay"></div>
+    <div class="login-card">
+      <div class="logo">
+        <div class="logo-icon">O</div>
+        <span class="logo-text">OASISIC</span>
+        <span class="logo-tag">Oasisic OpenWrt</span>
+      </div>
+      <h3>欢迎回来</h3>
+      <div class="hint">登录以管理您的旁路网关</div>
+      <div class="field-group">
+        <div class="field"><span class="icon">👤</span><input type="text" placeholder="用户名" value="admin" style="color:rgba(255,255,255,0.85)"></div>
+        <div class="field"><span class="icon">🔒</span><input type="password" placeholder="密码"></div>
+      </div>
+      <div class="options">
+        <label><input type="checkbox" checked> 记住我</label>
+        <span class="passkey">↩ Passkey</span>
+      </div>
+      <button class="btn btn-primary">登录</button>
+      <button class="btn btn-ghost">两步验证 2FA</button>
+      <div class="footer">luci-theme-oasisic <strong>v1.0.0</strong> · Oasisic OpenWrt</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="dash-wrapper">
+  <div class="dash-layout">
+    <!-- Sidebar -->
+    <div class="dash-sidebar">
+      <div>
+        <div class="logo">
+          <div class="logo-box">O</div>
+          <span class="logo-name">OASISIC</span>
+          <span class="logo-mode">旁路</span>
+        </div>
+        <div class="section-label">状态</div>
+        <div class="menu-item active">📊 仪表盘</div>
+        <div class="menu-item">📡 概览</div>
+        <div class="menu-item">📈 实时流量</div>
+        <div class="section-label">网络</div>
+        <div class="menu-item">🌐 接口</div>
+        <div class="menu-item">📶 无线</div>
+        <div class="menu-item">🛡️ 防火墙</div>
+        <div class="section-label">服务</div>
+        <div class="menu-item">⚡ Nikki</div>
+        <div class="menu-item">🔑 PassWall</div>
+      </div>
+      <div class="bottom">
+        <div class="device">Oasisic OpenWrt · 10.10.10.252</div>
+        <div class="role">● 旁路网关模式</div>
+      </div>
+    </div>
+    <!-- Main -->
+    <div class="dash-main">
+      <div class="dash-header">
+        <div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <h2>仪表盘</h2>
+            <span class="mode-badge">● 旁路网关</span>
+          </div>
+          <div class="meta">主路由: RouterOS 10.10.10.253 · 自动刷新 10s</div>
+        </div>
+        <div style="font-size:18px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:11px; color:#86868b; font-weight:500;">v1.0.0</span>
+          <span>⚙️</span>
+        </div>
+      </div>
+
+      <!-- Status bar for bypass mode -->
+      <div class="status-bar">
+        <div class="status-item">
+          <div class="label">设备</div>
+          <div class="value">Oasisic 旁路</div>
+        </div>
+        <div class="status-item">
+          <div class="label">运行时间</div>
+          <div class="value">12d 7h 32m</div>
+        </div>
+        <div class="status-item">
+          <div class="label">代理状态</div>
+          <div class="value"><span class="dot"></span>Nikki 运行中</div>
+        </div>
+        <div class="status-item">
+          <div class="label">上游网关</div>
+          <div class="value">10.10.10.253</div>
+        </div>
+        <div class="status-item">
+          <div class="label">DNS</div>
+          <div class="value">223.5.5.5</div>
+        </div>
+      </div>
+
+      <!-- Gauges -->
+      <div class="gauge-row">
+        <div class="gauge-card">
+          <div class="gauge-ring">
+            <svg width="48" height="48" viewBox="0 0 48 48">
+              <circle cx="24" cy="24" r="20" fill="none" stroke="#e8e8ed" stroke-width="3.5"/>
+              <circle cx="24" cy="24" r="20" fill="none" stroke="#007aff" stroke-width="3.5" stroke-dasharray="94 32" stroke-dashoffset="0" stroke-linecap="round"/>
+            </svg>
+            <div class="pct">35%</div>
+          </div>
+          <div class="gauge-info">
+            <div class="gauge-label">CPU</div>
+            <div class="gauge-detail">i5-7200U</div>
+          </div>
+        </div>
+        <div class="gauge-card">
+          <div class="gauge-ring">
+            <svg width="48" height="48" viewBox="0 0 48 48">
+              <circle cx="24" cy="24" r="20" fill="none" stroke="#e8e8ed" stroke-width="3.5"/>
+              <circle cx="24" cy="24" r="20" fill="none" stroke="#30d158" stroke-width="3.5" stroke-dasharray="78 48" stroke-dashoffset="0" stroke-linecap="round"/>
+            </svg>
+            <div class="pct">62%</div>
+          </div>
+          <div class="gauge-info">
+            <div class="gauge-label">内存</div>
+            <div class="gauge-detail">5.0 / 8.0 GB</div>
+          </div>
+        </div>
+        <div class="gauge-card">
+          <div class="gauge-ring">
+            <svg width="48" height="48" viewBox="0 0 48 48">
+              <circle cx="24" cy="24" r="20" fill="none" stroke="#e8e8ed" stroke-width="3.5"/>
+              <circle cx="24" cy="24" r="20" fill="none" stroke="#ff9f0a" stroke-width="3.5" stroke-dasharray="38 88" stroke-dashoffset="0" stroke-linecap="round"/>
+            </svg>
+            <div class="pct">15%</div>
+          </div>
+          <div class="gauge-info">
+            <div class="gauge-label">存储</div>
+            <div class="gauge-detail">3.2 / 21.4 GB</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards grid -->
+      <div class="cards-grid">
+        <div class="dash-card">
+          <div class="card-title">系统信息</div>
+          <div class="card-row"><span class="lbl">固件</span><span class="val">Oasisic OpenWrt 24.10</span></div>
+          <div class="card-row"><span class="lbl">内核</span><span class="val">Linux 6.6.73</span></div>
+          <div class="card-row"><span class="lbl">本地时间</span><span class="val">2026-07-13 15:33</span></div>
+          <div class="card-row"><span class="lbl">运行模式</span><span class="val blue">旁路网关</span></div>
+        </div>
+        <div class="dash-card">
+          <div class="card-title">网络状态</div>
+          <div class="card-row"><span class="lbl">LAN IP</span><span class="val">10.10.10.252</span></div>
+          <div class="card-row"><span class="lbl">上游网关</span><span class="val">10.10.10.253 (RouterOS)</span></div>
+          <div class="card-row"><span class="lbl">DNS</span><span class="val">223.5.5.5 · 1.1.1.1</span></div>
+          <div class="card-row"><span class="lbl">IPv6</span><span class="val green">已连接</span></div>
+        </div>
+        <div class="dash-card nikki">
+          <span class="badge">运行中</span>
+          <div class="card-title">⚡ Nikki 代理</div>
+          <div class="card-row"><span class="lbl">代理模式</span><span class="val blue">规则 (Rule)</span></div>
+          <div class="card-row"><span class="lbl">节点</span><span class="val green">🇯🇵 AWS-JP · 42ms</span></div>
+          <div class="card-row"><span class="lbl">今日流量</span><span class="val">↑ 128MB · ↓ 1.2GB</span></div>
+          <div class="card-row"><span class="lbl">运行时长</span><span class="val">12d 7h 32m</span></div>
+        </div>
+      </div>
+
+      <!-- Topology for bypass mode -->
+      <div class="topo-card">
+        <div class="topo-title">网络拓扑 (旁路模式)</div>
+        <div class="topo-row">
+          <span class="topo-node routeros">🌐 RouterOS</span>
+          <span class="topo-arrow">→</span>
+          <span class="topo-node openwrt">🟦 Oasisic 旁路</span>
+          <span class="topo-arrow">→</span>
+          <span class="topo-node device">📱 客户端</span>
+          <span class="topo-arrow">⇢</span>
+          <span class="topo-node device" style="background:rgba(16,185,129,0.08);color:#30d158;">AWS-JP</span>
+        </div>
+        <div class="topo-note">所有代理流量经 Nikki → AWS-JP 节点 · 国内直连流量不经旁路</div>
+      </div>
+
+      <!-- Traffic -->
+      <div class="chart-card">
+        <div class="chart-title">代理流量</div>
+        <div class="chart-vis" id="chart2"></div>
+        <div class="chart-legend">
+          <span>⬇ 下行 <b>12.5 MB/s</b></span>
+          <span>⬆ 上行 <b>2.3 MB/s</b></span>
+          <span style="color:#ff9f0a;">⚡ 代理流量占比 78%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ANALYSIS ===== -->
+<div class="analysis">
+  <h3>📋 旁路模式适配要点</h3>
+  <div class="analysis-grid">
+    <div class="analysis-item">
+      <h4>🔄 自动检测模式</h4>
+      <p>主题检测设备网络角色：若 WAN 口未拨号、只有 LAN 口、且网关指向另一台设备，则自动识别为「旁路网关模式」，仪表盘显示内容相应调整。</p>
+      <span class="tag tag-auto">自动适配</span>
+    </div>
+    <div class="analysis-item">
+      <h4>📊 仪表盘优先级调整</h4>
+      <p>旁路模式下，Nikki 状态置顶展示，WAN 信息替换为上游网关信息。CPU/内存/存储进度条保留，但代理流量图表替代传统 WAN 流量图。</p>
+      <span class="tag tag-adapt">仪表盘改造</span>
+    </div>
+    <div class="analysis-item">
+      <h4>🔗 拓扑可视化</h4>
+      <p>仪表盘显示简易拓扑：主路由 → 旁路网关 → 客户端 → 代理节点，让用户一目了然自己的网络架构。旁路节点高亮蓝色。</p>
+      <span class="tag tag-adapt">新功能</span>
+    </div>
+    <div class="analysis-item">
+      <h4>🏷️ 品牌一致性</h4>
+      <p>OASISIC = Oasisic OpenWrt。登录页显示全称，侧栏底部显示设备名和模式，仪表盘 Badge 标注「旁路网关」。</p>
+      <span class="tag tag-auto">品牌设计</span>
+    </div>
+    <div class="analysis-item">
+      <h4>🖥️ 壁纸系统</h4>
+      <p>Bing 每日壁纸自动获取，6小时更换一次。URL 适配屏幕分辨率（桌面/平板/手机），支持降级到内置渐变背景。</p>
+      <span class="tag tag-adapt">登录页</span>
+    </div>
+    <div class="analysis-item">
+      <h4>📱 响应式适配</h4>
+      <p>所有页面适配桌面/平板/手机。旁路模式下，小屏幕优先展示代理状态和流量，收起次要信息。</p>
+      <span class="tag tag-auto">全页面</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const bars = [28,35,22,45,38,50,42,30,35,48,52,40,34,28,42,55,58,48,38,32,45,52,48,40,35,28,45,50,42,38];
+  const chart2 = document.getElementById('chart2');
+  bars.forEach((h, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'chart-bar ' + (i % 2 === 1 ? 'up' : 'down');
+    bar.style.height = (h * 0.65 + 6) + 'px';
+    chart2.appendChild(bar);
+  });
+</script>
+
+</body>
+</html>

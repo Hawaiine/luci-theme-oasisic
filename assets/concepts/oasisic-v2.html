@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>luci-theme-oasisic — 全面优化</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    padding: 32px;
+    display: flex;
+    justify-content: center;
+  }
+  .container { max-width: 1100px; width: 100%; }
+  .page-title { font-size: 22px; font-weight: 700; margin-bottom: 2px; letter-spacing: -0.5px; }
+  .page-sub { color: #86868b; font-size: 13px; margin-bottom: 24px; }
+
+  /* ===== LOGIN PAGE ===== */
+  .login-wrapper {
+    border-radius: 18px; overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.06);
+    margin-bottom: 32px;
+  }
+  .login-frame {
+    position: relative;
+    aspect-ratio: 16/9;
+    background: #000;
+  }
+  .login-frame .bg-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .login-frame .overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.30) 100%);
+  }
+
+  /* Login card */
+  .login-card {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 376px;
+    background: rgba(15,15,20,0.55);
+    backdrop-filter: blur(80px) saturate(1.2);
+    -webkit-backdrop-filter: blur(80px) saturate(1.2);
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.05);
+    padding: 40px 32px 32px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.30);
+  }
+
+  /* NEW Logo — 几何菱形网络标记 */
+  .login-card .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .login-card .brand-mark {
+    width: 30px; height: 30px;
+    position: relative;
+  }
+  /* Diamond shape with inner dot — network node metaphor */
+  .brand-mark .diamond {
+    width: 30px; height: 30px;
+    background: #0071e3;
+    border-radius: 6px;
+    transform: rotate(45deg) scale(0.75);
+    position: absolute;
+    top: 4px; left: 4px;
+  }
+  .brand-mark .inner-dot {
+    width: 6px; height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 12px; left: 12px;
+  }
+  /* Connection lines */
+  .brand-mark .line-t {
+    width: 2px; height: 8px;
+    background: rgba(255,255,255,0.2);
+    position: absolute;
+    top: 2px; left: 14px;
+  }
+  .brand-mark .line-b {
+    width: 2px; height: 8px;
+    background: rgba(255,255,255,0.2);
+    position: absolute;
+    bottom: 2px; left: 14px;
+  }
+  .brand-mark .line-l {
+    width: 8px; height: 2px;
+    background: rgba(255,255,255,0.2);
+    position: absolute;
+    top: 14px; left: 2px;
+  }
+  .brand-mark .line-r {
+    width: 8px; height: 2px;
+    background: rgba(255,255,255,0.2);
+    position: absolute;
+    top: 14px; right: 2px;
+  }
+  .brand-mark .line-tl {
+    width: 2px; height: 6px;
+    background: rgba(255,255,255,0.12);
+    position: absolute;
+    top: 0; left: 8px;
+    transform: rotate(-45deg);
+  }
+  .login-card .brand-name {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+
+  .login-card h3 {
+    color: #fff;
+    font-size: 21px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
+    line-height: 1.15;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.25);
+  }
+  .login-card .hint {
+    color: rgba(255,255,255,0.55);
+    font-size: 14px;
+    margin-bottom: 28px;
+    letter-spacing: -0.1px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+
+  .login-card .fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .login-card .fields input {
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.25);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 400;
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    letter-spacing: -0.1px;
+  }
+  .login-card .fields input::placeholder {
+    color: rgba(255,255,255,0.30);
+  }
+  .login-card .fields input:focus {
+    border-color: rgba(0,113,227,0.5);
+    background: rgba(0,0,0,0.35);
+    box-shadow: 0 0 0 3px rgba(0,113,227,0.15);
+  }
+
+  .login-card .options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+  }
+  .login-card .options label {
+    color: rgba(255,255,255,0.45);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: default;
+    letter-spacing: -0.1px;
+  }
+  .login-card .options input[type="checkbox"] {
+    width: 15px; height: 15px;
+    accent-color: #0071e3;
+    border-radius: 3px;
+  }
+
+  /* Passkey — 清晰可读 */
+  .login-card .passkey {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+    border-radius: 30px;
+    border: 0.5px solid rgba(255,255,255,0.15);
+    letter-spacing: -0.1px;
+  }
+  .login-card .passkey::before {
+    content: "↩";
+    font-size: 11px;
+    opacity: 0.7;
+  }
+
+  .login-card .btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: default;
+    font-family: inherit;
+    letter-spacing: -0.1px;
+  }
+  .login-card .btn-primary {
+    background: #0071e3;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .login-card .btn-ghost {
+    background: transparent;
+    color: rgba(255,255,255,0.30);
+    font-size: 12px;
+    font-weight: 400;
+  }
+  .login-card .footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 28px;
+    color: rgba(255,255,255,0.12);
+    font-size: 10px;
+    letter-spacing: 0.2px;
+  }
+  .login-card .footer .ver {
+    color: rgba(255,255,255,0.10);
+    font-weight: 500;
+  }
+  .wallpaper-credit {
+    position: absolute;
+    bottom: 16px;
+    right: 20px;
+    color: rgba(255,255,255,0.15);
+    font-size: 10px;
+    background: rgba(0,0,0,0.20);
+    padding: 3px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    letter-spacing: 0.1px;
+  }
+
+  /* ===== DASHBOARD ===== */
+  .dash-wrapper {
+    border-radius: 18px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    background: #fff;
+    margin-bottom: 24px;
+  }
+  .dash-layout {
+    display: flex;
+    min-height: 600px;
+  }
+
+  /* Sidebar — 优化 */
+  .dash-sidebar {
+    width: 220px;
+    background: #1d1d1f;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .dash-sidebar .brand {
+    padding: 20px 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .dash-sidebar .brand .logo {
+    width: 26px; height: 26px;
+    background: #0071e3;
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 600; font-size: 12px;
+    transform: rotate(0deg);
+  }
+  .dash-sidebar .brand .name {
+    color: #fff; font-size: 14px; font-weight: 600; letter-spacing: -0.2px;
+  }
+  .dash-sidebar .brand .tag {
+    color: rgba(255,255,255,0.25); font-size: 9px;
+    margin-left: auto;
+    padding: 2px 7px;
+    border-radius: 3px;
+    background: rgba(0,113,227,0.12);
+    letter-spacing: 0.5px;
+  }
+  .dash-sidebar .section {
+    padding: 12px 20px 4px;
+    color: rgba(255,255,255,0.18);
+    font-size: 10px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+  .dash-sidebar .item {
+    padding: 9px 20px;
+    color: rgba(255,255,255,0.40);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: default;
+    position: relative;
+    transition: all 0.15s;
+  }
+  .dash-sidebar .item:hover {
+    color: rgba(255,255,255,0.65);
+  }
+  .dash-sidebar .item.active {
+    color: #fff;
+    background: rgba(255,255,255,0.04);
+  }
+  .dash-sidebar .item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 2px; height: 18px;
+    border-radius: 0 2px 2px 0;
+    background: #0071e3;
+  }
+  .dash-sidebar .item .icon {
+    width: 20px;
+    text-align: center;
+    font-size: 13px;
+  }
+  .dash-sidebar .spacer {
+    flex: 1;
+  }
+  .dash-sidebar .bottom {
+    padding: 14px 20px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  .dash-sidebar .bottom .info {
+    color: rgba(255,255,255,0.25);
+    font-size: 10px;
+    line-height: 1.5;
+  }
+  .dash-sidebar .bottom .info .dot {
+    color: #30d158;
+  }
+
+  /* Main content */
+  .dash-main {
+    flex: 1;
+    padding: 24px;
+    background: #f5f5f7;
+  }
+
+  .dash-main .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .dash-main .header .left h2 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .dash-main .header .left .meta {
+    font-size: 12px;
+    color: #86868b;
+    margin-top: 2px;
+  }
+  .dash-main .header .right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .dash-main .header .right .version {
+    font-size: 10px;
+    color: #c7c7cc;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+  .dash-main .header .right .settings {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.02);
+    border: 0.5px solid rgba(0,0,0,0.04);
+    display: flex; align-items: center; justify-content: center;
+    color: #86868b;
+    font-size: 13px;
+    cursor: default;
+  }
+
+  /* Status bar */
+  .status-row {
+    display: flex; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .status-item {
+    background: #fff;
+    border-radius: 10px;
+    padding: 11px 14px;
+    flex: 1;
+    border: 0.5px solid rgba(0,0,0,0.04);
+  }
+  .status-item .lbl { font-size: 10px; color: #86868b; margin-bottom: 3px; }
+  .status-item .val { font-size: 13px; font-weight: 600; color: #1d1d1f; }
+  .status-item .val .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #30d158;
+    margin-right: 4px;
+  }
+
+  /* Gauges */
+  .gauge-row {
+    display: flex; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .gauge-card {
+    flex: 1;
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px;
+    border: 0.5px solid rgba(0,0,0,0.04);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .gauge-ring { width: 44px; height: 44px; position: relative; flex-shrink: 0; }
+  .gauge-ring svg { transform: rotate(-90deg); }
+  .gauge-ring .pct {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #1d1d1f;
+  }
+  .gauge-info .gauge-lbl { font-size: 10px; color: #86868b; }
+  .gauge-info .gauge-dtl { font-size: 12px; font-weight: 500; color: #1d1d1f; }
+
+  /* Cards */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .dash-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px;
+    border: 0.5px solid rgba(0,0,0,0.04);
+    position: relative;
+  }
+  .dash-card .title {
+    font-size: 11px; font-weight: 600; color: #1d1d1f;
+    margin-bottom: 10px;
+    letter-spacing: -0.1px;
+  }
+  .dash-card .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2.5px 0;
+    font-size: 11px;
+  }
+  .dash-card .row .lbl { color: #86868b; }
+  .dash-card .row .val { color: #1d1d1f; font-weight: 500; }
+  .dash-card .row .val.green { color: #30d158; }
+  .dash-card .row .val.blue { color: #0071e3; }
+  .dash-card.nikki {
+    border-color: rgba(0,113,227,0.12);
+    background: linear-gradient(135deg, rgba(0,113,227,0.02), transparent);
+  }
+  .dash-card .badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    font-size: 8px; font-weight: 600;
+    color: #fff;
+    background: #0071e3;
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+  .dash-card .badge.green {
+    background: #30d158;
+  }
+
+  /* Chart */
+  .chart-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px;
+    border: 0.5px solid rgba(0,0,0,0.04);
+  }
+  .chart-card .chart-title { font-size: 11px; font-weight: 600; margin-bottom: 10px; }
+  .chart-vis { display: flex; align-items: flex-end; gap: 2px; height: 44px; }
+  .chart-bar {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    min-height: 3px;
+  }
+  .chart-bar.down { background: linear-gradient(to top, #0071e3, #40b4ff); opacity: 0.7; }
+  .chart-bar.up { background: linear-gradient(to top, #30d158, #63e6a0); opacity: 0.5; }
+  .chart-legend {
+    display: flex; gap: 14px; margin-top: 6px;
+    font-size: 10px; color: #86868b;
+  }
+  .chart-legend span b { color: #1d1d1f; font-weight: 600; }
+
+  /* ===== Changes summary ===== */
+  .changes {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 24px;
+    border: 1px solid #e8e8ed;
+  }
+  .changes h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+  .changes-list { display: flex; flex-direction: column; gap: 8px; }
+  .changes-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 10px 12px; background: #f5f5f7; border-radius: 8px;
+    font-size: 12px; color: #515154; line-height: 1.5;
+  }
+  .changes-item .num {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600;
+  }
+  .changes-item .num.done { background: #e6f4ea; color: #137333; }
+  .changes-item strong { color: #1d1d1f; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page-title">🏝️ luci-theme-oasisic</div>
+  <div class="page-sub">全面优化 — 新 Logo · 侧栏重构 · 版本号调整 · Passkey 可读性</div>
+
+  <!-- ===== LOGIN PAGE ===== -->
+  <div class="login-wrapper">
+    <div class="login-frame">
+      <img class="bg-img" src="https://picsum.photos/seed/oasisic-v2/1600/900" alt="">
+      <div class="overlay"></div>
+      <div class="login-card">
+        <!-- NEW Logo: 菱形网络节点标记 -->
+        <div class="brand">
+          <div class="brand-mark">
+            <div class="diamond"></div>
+            <div class="inner-dot"></div>
+            <div class="line-t"></div>
+            <div class="line-b"></div>
+            <div class="line-l"></div>
+            <div class="line-r"></div>
+            <div class="line-tl"></div>
+          </div>
+          <span class="brand-name">OASISIC</span>
+        </div>
+        <h3>欢迎回来</h3>
+        <div class="hint">登录以管理您的旁路网关</div>
+        <div class="fields">
+          <div><input type="text" placeholder="用户名" value="admin" style="color:rgba(255,255,255,0.85)"></div>
+          <div><input type="password" placeholder="密码"></div>
+        </div>
+        <div class="options">
+          <label><input type="checkbox" checked> 记住我</label>
+          <span class="passkey">Passkey</span>
+        </div>
+        <button class="btn btn-primary">登录</button>
+        <button class="btn btn-ghost">两步验证 2FA</button>
+        <div class="footer">
+          <span>luci-theme-oasisic</span>
+          <span class="ver">v1.0.0</span>
+        </div>
+      </div>
+      <div class="wallpaper-credit">Bing 每日壁纸 · 6h 自动更换</div>
+    </div>
+  </div>
+
+  <!-- ===== DASHBOARD ===== -->
+  <div class="dash-wrapper">
+    <div class="dash-layout">
+      <!-- Sidebar — 优化版 -->
+      <div class="dash-sidebar">
+        <div>
+          <div class="brand">
+            <div class="logo">O</div>
+            <span class="name">OASISIC</span>
+            <span class="tag">旁路</span>
+          </div>
+          <div class="section">状态</div>
+          <div class="item active"><span class="icon">◉</span>仪表盘</div>
+          <div class="item"><span class="icon">◎</span>概览</div>
+          <div class="item"><span class="icon">▤</span>实时流量</div>
+          <div class="section">网络</div>
+          <div class="item"><span class="icon">⊞</span>接口</div>
+          <div class="item"><span class="icon">⌇</span>无线</div>
+          <div class="item"><span class="icon">⊡</span>防火墙</div>
+          <div class="section">服务</div>
+          <div class="item"><span class="icon">⚡</span>Nikki</div>
+          <div class="item"><span class="icon">🔑</span>PassWall</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="bottom">
+          <div class="info"><span class="dot">●</span> Oasisic OpenWrt · 10.10.10.252</div>
+          <div class="info" style="margin-top:1px;">旁路网关模式</div>
+        </div>
+      </div>
+
+      <!-- Main -->
+      <div class="dash-main">
+        <div class="header">
+          <div class="left">
+            <h2>仪表盘</h2>
+            <div class="meta">主路由: RouterOS 10.10.10.253 · 自动刷新 10s</div>
+          </div>
+          <div class="right">
+            <span class="version">v1.0.0</span>
+            <div class="settings">⚙</div>
+          </div>
+        </div>
+
+        <!-- Status bar -->
+        <div class="status-row">
+          <div class="status-item"><div class="lbl">设备</div><div class="val">Oasisic 旁路</div></div>
+          <div class="status-item"><div class="lbl">运行时间</div><div class="val">12d 7h 32m</div></div>
+          <div class="status-item"><div class="lbl">代理状态</div><div class="val"><span class="dot"></span>Nikki 运行中</div></div>
+          <div class="status-item"><div class="lbl">上游网关</div><div class="val">10.10.10.253</div></div>
+          <div class="status-item"><div class="lbl">DNS</div><div class="val">223.5.5.5</div></div>
+        </div>
+
+        <!-- Gauges -->
+        <div class="gauge-row">
+          <div class="gauge-card">
+            <div class="gauge-ring">
+              <svg width="44" height="44" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="18" fill="none" stroke="#e8e8ed" stroke-width="3"/>
+                <circle cx="22" cy="22" r="18" fill="none" stroke="#0071e3" stroke-width="3" stroke-dasharray="85 28" stroke-dashoffset="0" stroke-linecap="round"/>
+              </svg>
+              <div class="pct">35%</div>
+            </div>
+            <div class="gauge-info"><div class="gauge-lbl">CPU</div><div class="gauge-dtl">i5-7200U</div></div>
+          </div>
+          <div class="gauge-card">
+            <div class="gauge-ring">
+              <svg width="44" height="44" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="18" fill="none" stroke="#e8e8ed" stroke-width="3"/>
+                <circle cx="22" cy="22" r="18" fill="none" stroke="#30d158" stroke-width="3" stroke-dasharray="70 42" stroke-dashoffset="0" stroke-linecap="round"/>
+              </svg>
+              <div class="pct">62%</div>
+            </div>
+            <div class="gauge-info"><div class="gauge-lbl">内存</div><div class="gauge-dtl">5.0 / 8.0 GB</div></div>
+          </div>
+          <div class="gauge-card">
+            <div class="gauge-ring">
+              <svg width="44" height="44" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="18" fill="none" stroke="#e8e8ed" stroke-width="3"/>
+                <circle cx="22" cy="22" r="18" fill="none" stroke="#ff9f0a" stroke-width="3" stroke-dasharray="34 80" stroke-dashoffset="0" stroke-linecap="round"/>
+              </svg>
+              <div class="pct">15%</div>
+            </div>
+            <div class="gauge-info"><div class="gauge-lbl">存储</div><div class="gauge-dtl">3.2 / 21.4 GB</div></div>
+          </div>
+        </div>
+
+        <!-- Cards -->
+        <div class="cards-grid">
+          <div class="dash-card">
+            <div class="title">系统信息</div>
+            <div class="row"><span class="lbl">固件</span><span class="val">Oasisic OpenWrt 24.10</span></div>
+            <div class="row"><span class="lbl">内核</span><span class="val">Linux 6.6.73</span></div>
+            <div class="row"><span class="lbl">时间</span><span class="val">2026-07-13 15:33</span></div>
+            <div class="row"><span class="lbl">模式</span><span class="val blue">旁路网关</span></div>
+          </div>
+          <div class="dash-card">
+            <div class="title">网络状态</div>
+            <div class="row"><span class="lbl">LAN IP</span><span class="val">10.10.10.252</span></div>
+            <div class="row"><span class="lbl">上游网关</span><span class="val">10.10.10.253</span></div>
+            <div class="row"><span class="lbl">DNS</span><span class="val">223.5.5.5</span></div>
+            <div class="row"><span class="lbl">IPv6</span><span class="val green">已连接</span></div>
+          </div>
+          <div class="dash-card nikki">
+            <span class="badge">运行中</span>
+            <div class="title">⚡ Nikki 代理</div>
+            <div class="row"><span class="lbl">模式</span><span class="val blue">规则</span></div>
+            <div class="row"><span class="lbl">节点</span><span class="val green">🇯🇵 AWS-JP · 42ms</span></div>
+            <div class="row"><span class="lbl">流量</span><span class="val">↑ 128MB · ↓ 1.2GB</span></div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-card">
+          <div class="chart-title">代理流量</div>
+          <div class="chart-vis" id="chart"></div>
+          <div class="chart-legend">
+            <span>⬇ 下行 <b>12.5 MB/s</b></span>
+            <span>⬆ 上行 <b>2.3 MB/s</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Changes -->
+  <div class="changes">
+    <h3>✏️ 改进清单</h3>
+    <div class="changes-list">
+      <div class="changes-item"><span class="num done">1</span><div><strong>Logo 重做</strong> — 改用菱形+内圆+连接线的网络节点隐喻设计，比纯色方块更有品牌识别度</div></div>
+      <div class="changes-item"><span class="num done">2</span><div><strong>Passkey 可读性</strong> — 白字 + 半透明白底渐变 + 微边框，清晰可点，不再是暗蓝色看不清</div></div>
+      <div class="changes-item"><span class="num done">3</span><div><strong>侧栏优化</strong> — 增加 section 分组间距、菜单图标统一、激活指示条改 2px 圆角线、hover 过渡色</div></div>
+      <div class="changes-item"><span class="num done">4</span><div><strong>版本号位置</strong> — 从夹在设置图标旁边改为独立浅灰标签 <code>v1.0.0</code>，更低调不干扰</div></div>
+      <div class="changes-item"><span class="num done">5</span><div><strong>全局细节</strong> — Apple Blue <code>#0071e3</code> 统一、卡片边框改用 0.5px、字号微调、间距收紧</div></div>
+    </div>
+  </div>
+</div>
+<script>
+  const bars = [28,35,22,45,38,50,42,30,35,48,52,40,34,28,42,55,58,48,38,32,45,52,48,40,35,28,45,50,42,38];
+  const c = document.getElementById('chart');
+  bars.forEach((h, i) => {
+    const b = document.createElement('div');
+    b.className = 'chart-bar ' + (i % 2 === 1 ? 'up' : 'down');
+    b.style.height = (h * 0.6 + 5) + 'px';
+    c.appendChild(b);
+  });
+</script>
+</body>
+</html>

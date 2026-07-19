@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>luci-theme-oasisic — 登录页概念</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    padding: 32px;
+  }
+  .page-title {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .page-sub {
+    color: #86868b;
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+  .tech-note {
+    background: rgba(0,122,255,0.06);
+    border: 1px solid rgba(0,122,255,0.12);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    font-size: 13px;
+    color: #1d1d1f;
+    line-height: 1.6;
+  }
+  .tech-note strong { color: #007aff; }
+
+  /* Mock device frames */
+  .device-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  /* ===== LOGIN PAGE WITH BING BACKGROUND ===== */
+  .login-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 8px 32px rgba(0,0,0,0.06);
+  }
+  .login-frame {
+    position: relative;
+    width: 100%;
+    background: #000;
+  }
+  /* Desktop 16:10 */
+  .login-frame.desktop { aspect-ratio: 16 / 10; }
+  .login-frame.tablet { aspect-ratio: 4 / 3; max-width: 600px; }
+  .login-frame.phone { aspect-ratio: 9 / 19; max-width: 320px; }
+
+  .login-frame .bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .login-frame .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.3) 100%);
+  }
+
+  /* Glass card */
+  .login-card {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(400px, 85%);
+    background: rgba(255,255,255,0.10);
+    backdrop-filter: blur(50px) saturate(1.4);
+    -webkit-backdrop-filter: blur(50px) saturate(1.4);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 36px 32px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  }
+  .login-card .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .login-card .logo-icon {
+    width: 30px; height: 30px;
+    background: #007aff;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 15px;
+  }
+  .login-card .logo-text {
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .login-card h3 {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+  .login-card .hint {
+    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+  .login-card .field-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .login-card .field {
+    position: relative;
+  }
+  .login-card .field input {
+    width: 100%;
+    padding: 13px 16px 13px 40px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .login-card .field input::placeholder { color: rgba(255,255,255,0.3); }
+  .login-card .field input:focus { border-color: rgba(0,122,255,0.5); background: rgba(255,255,255,0.08); }
+  .login-card .field .icon {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.3);
+    font-size: 14px;
+  }
+  .login-card .options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .login-card .options label {
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: default;
+  }
+  .login-card .options input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: #007aff;
+    border-radius: 4px;
+  }
+  .login-card .passkey {
+    color: #007aff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    background: rgba(0,122,255,0.12);
+    border-radius: 20px;
+    border: 1px solid rgba(0,122,255,0.15);
+  }
+  .login-card .btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 12px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: default;
+    transition: all 0.15s;
+  }
+  .login-card .btn-primary {
+    background: #007aff;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .login-card .btn-ghost {
+    background: transparent;
+    color: rgba(255,255,255,0.35);
+    font-size: 12px;
+    font-weight: 400;
+  }
+  .login-card .footer {
+    text-align: center;
+    color: rgba(255,255,255,0.15);
+    font-size: 11px;
+    margin-top: 24px;
+    letter-spacing: 0.3px;
+  }
+
+  /* Wallpaper rotation indicator */
+  .wallpaper-info {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.3);
+    font-size: 11px;
+    background: rgba(0,0,0,0.3);
+    padding: 4px 14px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+  }
+
+  /* Device label */
+  .device-label {
+    text-align: center;
+    font-size: 12px;
+    color: #86868b;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .device-label .frame {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 4px;
+    background: #f0f0f0;
+    font-size: 11px;
+    color: #1d1d1f;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title">🏝️ luci-theme-oasisic</div>
+<div class="page-sub">登录页 — Bing 每日壁纸自动更换 · 多端适配</div>
+
+<!-- Technical Summary -->
+<div class="tech-note">
+  <strong>📌 技术方案：</strong> 登录页背景使用 <strong>Bing 每日壁纸</strong>（国内直连、免费、高清），
+  每天自动更换。支持回退到内置渐变色。登录信息保存在 localStorage，
+  客户端缓存壁纸 URL 避免重复加载。全响应式适配桌面/平板/手机。
+</div>
+
+<!-- Desktop + Tablet Preview -->
+<div class="device-row">
+  <div style="flex:1; min-width:300px;">
+    <div class="login-wrapper">
+      <div class="login-frame desktop">
+        <!-- Real Bing wallpaper via picsum for demo -->
+        <img class="bg-img" src="https://picsum.photos/seed/oasisic1/1600/1000" alt="Wallpaper">
+        <div class="overlay"></div>
+        <div class="login-card">
+          <div class="logo">
+            <div class="logo-icon">O</div>
+            <span class="logo-text">OASISIC</span>
+          </div>
+          <h3>欢迎回来</h3>
+          <div class="hint">登录以管理您的路由器</div>
+          <div class="field-group">
+            <div class="field">
+              <span class="icon">👤</span>
+              <input type="text" placeholder="用户名" value="admin" style="color:rgba(255,255,255,0.85)">
+            </div>
+            <div class="field">
+              <span class="icon">🔒</span>
+              <input type="password" placeholder="密码">
+            </div>
+          </div>
+          <div class="options">
+            <label><input type="checkbox" checked> 记住我</label>
+            <span class="passkey">↩ 使用 Passkey</span>
+          </div>
+          <button class="btn btn-primary">登录</button>
+          <button class="btn btn-ghost">两步验证 2FA</button>
+          <div class="footer">v1.0.0 · OpenWrt LuCI</div>
+        </div>
+        <div class="wallpaper-info">🖼 Bing 每日壁纸 · 6h 后自动更换</div>
+      </div>
+    </div>
+    <div class="device-label"><span class="frame">💻 桌面端 16:10</span> 毛玻璃居中卡片 · 全屏背景</div>
+  </div>
+
+  <div style="flex:0 0 auto;">
+    <div class="login-wrapper">
+      <div class="login-frame tablet">
+        <img class="bg-img" src="https://picsum.photos/seed/oasisic2/800/600" alt="Wallpaper">
+        <div class="overlay"></div>
+        <div class="login-card" style="width:min(340px, 88%); padding:28px 24px;">
+          <div class="logo" style="margin-bottom:20px;">
+            <div class="logo-icon">O</div>
+            <span class="logo-text">OASISIC</span>
+          </div>
+          <h3 style="font-size:20px;">欢迎回来</h3>
+          <div class="hint" style="margin-bottom:18px; font-size:13px;">登录以管理路由器</div>
+          <div class="field-group" style="gap:8px;">
+            <div class="field"><input type="text" placeholder="用户名" style="padding:11px 14px 11px 36px; font-size:13px;"></div>
+            <div class="field"><input type="password" placeholder="密码" style="padding:11px 14px 11px 36px; font-size:13px;"></div>
+          </div>
+          <div class="options" style="margin-bottom:16px;">
+            <label style="font-size:12px;"><input type="checkbox" checked> 记住我</label>
+            <span class="passkey" style="font-size:11px; padding:4px 10px;">Passkey</span>
+          </div>
+          <button class="btn btn-primary" style="padding:11px; font-size:14px;">登录</button>
+        </div>
+      </div>
+    </div>
+    <div class="device-label"><span class="frame">📱 平板 4:3</span> 缩小的卡片比例</div>
+  </div>
+</div>
+
+<!-- Phone -->
+<div style="display:flex; gap:24px; align-items:flex-start;">
+  <div>
+    <div class="login-wrapper" style="max-width:320px;">
+      <div class="login-frame phone">
+        <img class="bg-img" src="https://picsum.photos/seed/oasisic3/360/760" alt="Wallpaper">
+        <div class="overlay" style="background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.4) 100%);"></div>
+        <div class="login-card" style="width:88%; padding:24px 20px; top:45%;">
+          <div class="logo" style="margin-bottom:16px; justify-content:center;">
+            <div class="logo-icon" style="width:26px;height:26px;font-size:13px;">O</div>
+            <span class="logo-text" style="font-size:15px;">OASISIC</span>
+          </div>
+          <h3 style="font-size:18px; text-align:center;">欢迎回来</h3>
+          <div class="hint" style="margin-bottom:16px; font-size:12px; text-align:center;">登录以管理路由器</div>
+          <div class="field-group" style="gap:8px;">
+            <div class="field"><input type="text" placeholder="用户名" style="padding:10px 12px 10px 34px; font-size:13px;"></div>
+            <div class="field"><input type="password" placeholder="密码" style="padding:10px 12px 10px 34px; font-size:13px;"></div>
+          </div>
+          <div class="options" style="margin-bottom:14px; flex-direction:column; align-items:stretch; gap:8px;">
+            <label style="font-size:12px;"><input type="checkbox" checked> 记住我</label>
+            <span class="passkey" style="text-align:center; font-size:11px;">↩ 使用 Passkey</span>
+          </div>
+          <button class="btn btn-primary" style="padding:11px; font-size:14px;">登录</button>
+        </div>
+      </div>
+    </div>
+    <div class="device-label"><span class="frame">📱 手机 9:19</span> 卡片居中</div>
+  </div>
+
+  <!-- Implementation details -->
+  <div style="flex:1; background:#fff; border-radius:16px; padding:24px; border:1px solid #e8e8ed;">
+    <div style="font-size:15px; font-weight:600; margin-bottom:16px;">⚙️ 壁纸系统实现方案</div>
+    <div style="font-size:13px; line-height:1.8; color:#515154;">
+      <p><strong>① 壁纸来源：</strong>Bing 每日壁纸 API</p>
+      <pre style="background:#f5f5f7; padding:10px 14px; border-radius:8px; font-size:12px; margin:4px 0 12px; overflow-x:auto;">
+// 获取 Bing 每日壁纸（无需 API Key）
+const bingUrl = 'https://www.bing.com/HPImageArchive.aspx' +
+  '?format=js&idx=0&n=1&mkt=zh-CN';
+
+fetch(bingUrl)
+  .then(r => r.json())
+  .then(d => {
+    const url = 'https://www.bing.com' + d.images[0].url;
+    // url 含分辨率参数，自动适配屏幕
+    document.querySelector('.login-bg').src = url;
+    localStorage.setItem('bgUrl', url);
+    localStorage.setItem('bgTime', Date.now());
+  });</pre>
+
+      <p><strong>② 自动更换策略：</strong></p>
+      <pre style="background:#f5f5f7; padding:10px 14px; border-radius:8px; font-size:12px; margin:4px 0 12px;">
+// 检查是否需更新（默认 6 小时）
+const HOURS = 6;
+const lastTime = localStorage.getItem('bgTime');
+const elapsed = (Date.now() - parseInt(lastTime)) / 1000 / 3600;
+if (!lastTime || elapsed > HOURS) {
+  fetchNewWallpaper();
+} else {
+  // 使用缓存的壁纸
+  document.querySelector('.login-bg').src =
+    localStorage.getItem('bgUrl');
+}</pre>
+
+      <p><strong>③ 多端适配：</strong>Bing 壁纸返回的 URL 含分辨率参数（如 <code>_1920x1080.jpg</code>），前端可替换为 <code>_1920x1080</code>、<code>_1366x768</code>、<code>_1080x1920</code> 来自适应不同屏幕。外层容器用 <code>object-fit: cover</code> 确保铺满。</p>
+
+      <p><strong>④ 回退方案：</strong>壁纸加载失败时，自动降级为内置渐变色背景（深蓝紫渐变）。</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
