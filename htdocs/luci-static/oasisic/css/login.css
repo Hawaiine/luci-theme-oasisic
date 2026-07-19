@@ -229,6 +229,15 @@
   font-weight: 500;
 }
 
+/* ===== Wallpaper credit ===== */
+.oasisic-login-wallpaper-credit {
+  position: absolute;
+  bottom: -32px;
+  right: 0;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 9px;
+}
+
 /* ===== Shake animation ===== */
 @keyframes oasisic-shake {
   0%, 100% { transform: translateX(0); }

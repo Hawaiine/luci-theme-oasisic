@@ -19,8 +19,7 @@ var OasisicLogin = (function() {
       config.totpEnabled = opts.totpEnabled || false;
       config.totpAvailable = opts.totpAvailable || false;
     }
-    // Bing wallpaper API is blocked by CORS on router, use fallback
-    fallbackBackground(document.getElementById('loginBg'));
+    loadWallpaper();
     bindFormSubmit();
     bindTOTPSubmit();
     bindTOTPInput();
@@ -43,16 +42,15 @@ var OasisicLogin = (function() {
 
   function fetchBingWallpaper(bgEl) {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', BING_API, true);
+    xhr.open('GET', OASISIC_API_PATH + '/wallpaper', true);
     xhr.timeout = 5000;
     xhr.onload = function() {
       if (xhr.status === 200) {
         try {
           var data = JSON.parse(xhr.responseText);
-          if (data && data.images && data.images[0] && data.images[0].url) {
-            var url = 'https://www.bing.com' + data.images[0].url;
-            setBackground(bgEl, url);
-            localStorage.setItem('oasisic-wallpaper-url', url);
+          if (data && data.success && data.url) {
+            setBackground(bgEl, data.url, data.copyright || '');
+            localStorage.setItem('oasisic-wallpaper-url', data.url);
             localStorage.setItem('oasisic-wallpaper-time', String(Date.now()));
             return;
           }
@@ -65,11 +63,15 @@ var OasisicLogin = (function() {
     xhr.send();
   }
 
-  function setBackground(el, url) {
+  function setBackground(el, url, copyright) {
     var img = new Image();
     img.onload = function() { el.style.backgroundImage = 'url(' + url + ')'; };
     img.onerror = function() { fallbackBackground(el); };
     img.src = url;
+    if (copyright) {
+      var credit = document.getElementById('wallpaperCredit');
+      if (credit) credit.textContent = copyright;
+    }
   }
 
   function fallbackBackground(el) {
