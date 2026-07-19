@@ -21,12 +21,7 @@ jobs:
           ln -s $GITHUB_WORKSPACE package/luci-theme-oasisic
           ./scripts/feeds update -a && ./scripts/feeds install -a
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
-          echo "CONFIG_SIGNED_PACKAGES=y" >> .config
           make defconfig
-          # 生成 usign 签名密钥（key-build + key-build.pub）
-          # 参考：https://openwrt.org/docs/guide-user/security/release_signatures
-          usign -G -s key-build -p key-build.pub 2>/dev/null
-          echo "untrusted comment: Local build key" | cat - key-build.pub > key-build.pub.tmp && mv key-build.pub.tmp key-build.pub
           make package/luci-theme-oasisic/compile -j$(nproc) V=s 2>&1
       - name: 上传
         uses: actions/upload-artifact@v7
