@@ -18,10 +18,11 @@ jobs:
           cd openwrt
           ./scripts/feeds update -a && ./scripts/feeds install -a
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
+          echo "CONFIG_TARGET_x86_64=y" >> .config
+          echo "CONFIG_TARGET_x86_64_Generic=y" >> .config
           make defconfig
-          # 先编译 host tools 和 toolchain，避免后续 package 编译时触发全量依赖链
+          # 先编译 host tools，避免后续 host 编译时找不到工具
           make tools/compile -j$(nproc) 2>&1
-          make toolchain/compile -j$(nproc) 2>&1
           # 生成签名密钥（CONFIG_SIGNED_PACKAGES 需要 EC 私钥）
           openssl ecparam -genkey -name prime256v1 -out private-key.pem 2>/dev/null
           make package/luci-theme-oasisic/compile -j$(nproc) V=s 2>&1
