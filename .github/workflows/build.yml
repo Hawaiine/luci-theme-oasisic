@@ -8,18 +8,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/openwrt/sdk:x86_64-25.12.5
-      options: --user root
     steps:
       - uses: actions/checkout@v7
+      - name: 下载 SDK
+        run: |
+          wget -q -O sdk.tar.zst https://downloads.openwrt.org/releases/25.12.5/targets/x86/64/openwrt-sdk-25.12.5-x86-64_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+          mkdir -p sdk
+          tar -I zstd -xf sdk.tar.zst -C sdk --strip-components=1
       - name: 编译
         run: |
-          # 链接主题包到 SDK 的 package 目录
+          cd sdk
           ln -s $GITHUB_WORKSPACE package/luci-theme-oasisic
-          # 安装 feeds 依赖（luci-base）
           ./scripts/feeds update -a && ./scripts/feeds install -a
-          # 配置并编译
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
           make defconfig
           openssl ecparam -genkey -name prime256v1 -out private-key.pem 2>/dev/null
@@ -28,4 +28,4 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: oasisic-x86_64-25.12
-          path: bin/packages/x86_64/base/luci-theme-oasisic*.apk
+          path: sdk/bin/packages/x86_64/base/luci-theme-oasisic*.apk
