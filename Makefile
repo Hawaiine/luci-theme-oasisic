@@ -35,8 +35,6 @@ define Build/Configure
 endef
 
 define Build/Compile
-	# 编译翻译文件 .po → .lmo（po2lmo 由 luci-base host 编译提供）
-	$(STAGING_DIR_HOST)/bin/po2lmo ./po/zh-cn/$(PKG_NAME).po ./po/zh-cn/$(PKG_NAME).lmo 2>/dev/null || true
 endef
 
 define Package/$(PKG_NAME)/install
