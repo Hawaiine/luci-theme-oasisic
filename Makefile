@@ -70,9 +70,9 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
 	$(CP) ./root/usr/share/luci/menu.d/* $(1)/usr/share/luci/menu.d/
 
-	# 翻译文件（由 CI 编译后复制到源码目录）
+	# 翻译文件（预编译的 .lmo 文件）
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	[ -d ./po/zh-cn ] && $(CP) ./po/zh-cn/*.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
+	$(CP) ./po/zh-cn/$(PKG_NAME).lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))

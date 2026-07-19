@@ -25,13 +25,6 @@ jobs:
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
           echo "CONFIG_SIGNED_PACKAGES=y" >> .config
           echo "CONFIG_SIGNATURE_CHECK=y" >> .config
-          # 先编译 luci-base host（提供 po2lmo），再编译 .po → .lmo
-          make package/feeds/luci/luci-base/host-compile -j1 2>/dev/null || true
-          PO2LMO=staging_dir/hostpkg/bin/po2lmo
-          if [ -f "$PO2LMO" ]; then
-            mkdir -p $GITHUB_WORKSPACE/po/zh-cn
-            $PO2LMO $GITHUB_WORKSPACE/po/zh-cn/luci-theme-oasisic.po $GITHUB_WORKSPACE/po/zh-cn/luci-theme-oasisic.lmo 2>/dev/null && echo "✅ 编译翻译: zh-cn" || true
-          fi
           make package/luci-theme-oasisic/compile -j$(nproc) V=s 2>&1
           # 签名 APK
           SDK_USIGN=staging_dir/host/bin/usign
