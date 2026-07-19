@@ -58,7 +58,7 @@ define Package/$(PKG_NAME)/install
 
 	# 控制器
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller/oasisic
-		$(CP) ./luasrc/controller/oasisic/*.lua $(1)/usr/lib/lua/luci/controller/oasisic/
+	$(CP) ./luasrc/controller/oasisic/*.lua $(1)/usr/lib/lua/luci/controller/oasisic/
 
 	# 版本信息
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/dispatcher
@@ -72,7 +72,7 @@ define Package/$(PKG_NAME)/install
 
 	# 翻译文件
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-		$(CP) ./luasrc/controller/oasisic/$(PKG_NAME).zh-cn.lmo $(1)/usr/lib/lua/luci/i18n/
+	$(CP) ./luasrc/controller/oasisic/$(PKG_NAME).zh-cn.lmo $(1)/usr/lib/lua/luci/i18n/
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
