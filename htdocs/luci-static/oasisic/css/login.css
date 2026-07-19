@@ -70,27 +70,6 @@
   flex-shrink: 0;
 }
 
-.oasisic-logo-diamond {
-  width: 30px;
-  height: 30px;
-  background: #0071e3;
-  border-radius: 6px;
-  transform: rotate(45deg) scale(0.75);
-  position: absolute;
-  top: 4px;
-  left: 4px;
-}
-
-.oasisic-logo-dot {
-  width: 6px;
-  height: 6px;
-  background: #fff;
-  border-radius: 50%;
-  position: absolute;
-  top: 12px;
-  left: 12px;
-}
-
 .oasisic-login-brand-name {
   color: #fff;
   font-size: 16px;
@@ -248,15 +227,6 @@
 .oasisic-login-ver {
   color: rgba(255, 255, 255, 0.35);
   font-weight: 500;
-}
-
-/* ===== Wallpaper credit ===== */
-.oasisic-login-wallpaper-credit {
-  position: absolute;
-  bottom: -32px;
-  right: 0;
-  color: rgba(255, 255, 255, 0.10);
-  font-size: 9px;
 }
 
 /* ===== Shake animation ===== */

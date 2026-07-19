@@ -19,7 +19,8 @@ var OasisicLogin = (function() {
       config.totpEnabled = opts.totpEnabled || false;
       config.totpAvailable = opts.totpAvailable || false;
     }
-    loadWallpaper();
+    // Bing wallpaper API is blocked by CORS on router, use fallback
+    fallbackBackground(document.getElementById('loginBg'));
     bindFormSubmit();
     bindTOTPSubmit();
     bindTOTPInput();
