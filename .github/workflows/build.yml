@@ -25,16 +25,23 @@ jobs:
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
           echo "CONFIG_SIGNED_PACKAGES=y" >> .config
           echo "CONFIG_SIGNATURE_CHECK=y" >> .config
+          # 先编译 po2lmo 工具，再编译 .po → .lmo
+          make package/feeds/luci/luci-base/host-compile -j1 2>/dev/null || true
+          PO2LMO=staging_dir/host/bin/po2lmo
+          if [ -f "$PO2LMO" ]; then
+            for po_file in $GITHUB_WORKSPACE/po/*/*.po; do
+              lang=$(basename $(dirname "$po_file"))
+              $PO2LMO "$po_file" "$GITHUB_WORKSPACE/po/$lang/luci-theme-oasisic.lmo" 2>/dev/null || true
+              echo "✅ 编译翻译: $lang"
+            done
+          fi
           make package/luci-theme-oasisic/compile -j$(nproc) V=s 2>&1
-          # 编译完成后签名 APK（用 SDK 自带的 apk sign 嵌入签名）
-          SDK_APK=staging_dir/host/bin/apk
+          # 签名 APK
           SDK_USIGN=staging_dir/host/bin/usign
           APK_FILE=$(ls bin/packages/x86_64/base/luci-theme-oasisic*.apk 2>/dev/null | head -1)
           if [ -n "$APK_FILE" ] && [ -f "$SDK_USIGN" ]; then
             $SDK_USIGN -G -s key-build -p key-build.pub 2>/dev/null
-            if [ -f "$SDK_APK" ]; then
-              $SDK_APK sign --key key-build "$APK_FILE" 2>/dev/null || true
-            fi
+            $SDK_USIGN -S -s key-build -m "$APK_FILE" -o "$APK_FILE.sig" 2>/dev/null || true
             echo "✅ APK 签名完成: $(basename $APK_FILE)"
           fi
       - name: 上传

@@ -1,0 +1,35 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh-cn\n"
+
+msgid "Welcome back"
+msgstr "欢迎回来"
+
+msgid "Log in to manage your router"
+msgstr "登录以管理您的路由器"
+
+msgid "Two-factor authentication"
+msgstr "两步验证"
+
+msgid "Enter the 6-digit code from your authenticator app"
+msgstr "请输入验证器应用中的 6 位验证码"
+
+msgid "6-digit code"
+msgstr "6 位验证码"
+
+msgid "Verify"
+msgstr "验证"
+
+msgid "Back to login"
+msgstr "返回登录"
+
+msgid "Bing daily wallpaper"
+msgstr "Bing 每日壁纸"
+
+msgid "Passkey"
+msgstr "通行密钥"
+
+msgid "Remember me"
+msgstr "记住我"

@@ -69,6 +69,12 @@ define Package/$(PKG_NAME)/install
 	$(CP) ./root/etc/uci-defaults/* $(1)/etc/uci-defaults/
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
 	$(CP) ./root/usr/share/luci/menu.d/* $(1)/usr/share/luci/menu.d/
+
+	# 翻译文件（由 CI 预编译后安装）
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
+	for lmo in ./po/*/*.lmo; do \
+		[ -f "$$lmo" ] && $(CP) $$lmo $(1)/usr/lib/lua/luci/i18n/; \
+	done
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
