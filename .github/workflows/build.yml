@@ -19,9 +19,6 @@ jobs:
           ./scripts/feeds update -a && ./scripts/feeds install -a
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
           make defconfig
-          # 先编译 tools 和 libdeflate host，避免 lua 解压时找不到 libdeflate-gzip
-          make tools/compile -j$(nproc) 2>&1 || true
-          make package/feeds/packages/libdeflate/host-compile -j$(nproc) 2>&1 || true
           # 生成签名密钥（CONFIG_SIGNED_PACKAGES 需要 EC 私钥）
           openssl ecparam -genkey -name prime256v1 -out private-key.pem 2>/dev/null
           make package/luci-theme-oasisic/compile -j$(nproc) V=s 2>&1
