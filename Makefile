@@ -38,29 +38,36 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/install
+	# 静态文件
 	$(INSTALL_DIR) $(1)/www/luci-static/oasisic/css
 	$(INSTALL_DIR) $(1)/www/luci-static/oasisic/js
 	$(INSTALL_DIR) $(1)/www/luci-static/oasisic/img
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/oasisic
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/dispatcher
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller/oasisic
-	$(INSTALL_DIR) $(1)/usr/share/ucode/luci/template/oasisic
-	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
-
 	$(CP) ./htdocs/luci-static/oasisic/css/* $(1)/www/luci-static/oasisic/css/
 	$(CP) ./htdocs/luci-static/oasisic/js/* $(1)/www/luci-static/oasisic/js/
 	$(CP) ./htdocs/luci-static/oasisic/img/* $(1)/www/luci-static/oasisic/img/
 	$(CP) ./htdocs/luci-static/oasisic/manifest.json $(1)/www/luci-static/oasisic/
 	$(CP) ./htdocs/luci-static/oasisic/sw.js $(1)/www/luci-static/oasisic/
 
-	$(CP) ./luasrc/template/oasisic/* $(1)/usr/lib/lua/luci/view/oasisic/
-	$(CP) ./luasrc/dispatcher/oasisic.lua $(1)/usr/lib/lua/luci/dispatcher/
+	# Lua 模板（主题视图路径）
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/themes/oasisic
+	$(CP) ./luasrc/template/themes/oasisic/* $(1)/usr/lib/lua/luci/view/themes/oasisic/
+
+	# ucode 模板（主题视图路径）
+	$(INSTALL_DIR) $(1)/usr/share/ucode/luci/view/themes/oasisic
+	$(CP) ./ucode/template/themes/oasisic/* $(1)/usr/share/ucode/luci/view/themes/oasisic/
+
+	# 控制器
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller/oasisic
 	$(CP) ./luasrc/controller/oasisic/* $(1)/usr/lib/lua/luci/controller/oasisic/
 
-	$(CP) ./ucode/template/oasisic/* $(1)/usr/share/ucode/luci/template/oasisic/
+	# 版本信息
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/dispatcher
+	$(CP) ./luasrc/dispatcher/oasisic.lua $(1)/usr/lib/lua/luci/dispatcher/
 
+	# 主题注册
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(CP) ./root/etc/uci-defaults/* $(1)/etc/uci-defaults/
+	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
 	$(CP) ./root/usr/share/luci/menu.d/* $(1)/usr/share/luci/menu.d/
 endef
 

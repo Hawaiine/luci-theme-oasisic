@@ -22,22 +22,20 @@ jobs:
           ./scripts/feeds update -a && ./scripts/feeds install -a
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
           make defconfig 2>/dev/null || true
-          # 确保关键选项存在
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
           echo "CONFIG_SIGNED_PACKAGES=y" >> .config
           echo "CONFIG_SIGNATURE_CHECK=y" >> .config
-          # 生成 usign 签名密钥（编译后用于签名 APK）
           make package/luci-theme-oasisic/compile -j$(nproc) V=s 2>&1
-          # 编译完成后用 SDK 自带的 usign 签名 APK
+          # 编译完成后签名 APK（用 SDK 自带的 apk sign 嵌入签名）
+          SDK_APK=staging_dir/host/bin/apk
           SDK_USIGN=staging_dir/host/bin/usign
-          if [ -f "$SDK_USIGN" ]; then
+          APK_FILE=$(ls bin/packages/x86_64/base/luci-theme-oasisic*.apk 2>/dev/null | head -1)
+          if [ -n "$APK_FILE" ] && [ -f "$SDK_USIGN" ]; then
             $SDK_USIGN -G -s key-build -p key-build.pub 2>/dev/null
-            APK_FILE=$(ls bin/packages/x86_64/base/luci-theme-oasisic*.apk 2>/dev/null | head -1)
-            if [ -n "$APK_FILE" ]; then
-              # 签名仓库索引（APK 需要签名后的索引才能被信任）
-              $SDK_USIGN -S -s key-build -m bin/packages/x86_64/base/Packages.adb -o bin/packages/x86_64/base/Packages.adb.sig 2>/dev/null || true
-              echo "✅ APK 已签名"
+            if [ -f "$SDK_APK" ]; then
+              $SDK_APK sign --key key-build "$APK_FILE" 2>/dev/null || true
             fi
+            echo "✅ APK 签名完成: $(basename $APK_FILE)"
           fi
       - name: 上传
         uses: actions/upload-artifact@v7
