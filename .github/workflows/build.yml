@@ -18,9 +18,13 @@ jobs:
           cd openwrt
           ./scripts/feeds update -a && ./scripts/feeds install -a
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
-          echo "CONFIG_TARGET_x86_64=y" >> .config
-          echo "CONFIG_TARGET_x86_64_Generic=y" >> .config
           make defconfig
+          # 替换目标架构为 x86_64（默认是 aarch64，toolchain 编译慢且不需要）
+          sed -i 's/CONFIG_TARGET_mediatek_filogic=y/CONFIG_TARGET_x86_64=y/' .config 2>/dev/null || true
+          sed -i 's/CONFIG_TARGET_mediatek=y/CONFIG_TARGET_x86=y/' .config 2>/dev/null || true
+          sed -i '/CONFIG_TARGET_aarch64/d' .config 2>/dev/null || true
+          echo "CONFIG_TARGET_x86_64_Generic=y" >> .config
+          echo "CONFIG_TARGET_x86_64=y" >> .config
           # 先编译 host tools，避免后续 host 编译时找不到工具
           make tools/compile -j$(nproc) 2>&1
           # 生成签名密钥（CONFIG_SIGNED_PACKAGES 需要 EC 私钥）
