@@ -1,45 +1,90 @@
+{#
+	luci-theme-oasisic v1.0.0
+	Oasisic OpenWrt — Apple-inspired minimal LuCI theme
+	Licensed under Apache 2.0
+-#}
+
 {%
-	let ver = luci.dispatcher.oasisic.version();
+	import { readfile, access } from 'fs';
+	import { cursor } from 'uci';
+	import { srand } from 'math';
+
+	const boardinfo = ubus.call("system", "board");
+	const hostname = striptags(boardinfo?.hostname ?? '?');
+
+	http.prepare_content('text/html; charset=UTF-8');
+
+	srand(+substr(reverse(time() + ""), 0, 8));
 %}
 <!DOCTYPE html>
-<html lang="{{ luci.i18n.context.lang }}" data-theme="{{ L.theme_mode() }}" data-version="{{ ver }}">
+<html lang="{{ dispatcher.lang }}" data-theme="dark">
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>{{ hostname }} - Oasisic</title>
+
+	<meta name="robots" content="noindex, nofollow">
+	<meta http-equiv="X-Content-Type-Options" content="nosniff">
+	<meta http-equiv="X-XSS-Protection" content="1; mode=block">
+	<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+	<meta name="format-detection" content="telephone=no, email=no">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-title" content="Oasisic">
 	<meta name="theme-color" content="#1d1d1f">
-	<title>{{ striptags(luci.sys.hostname()) }} - Oasisic</title>
-	<link rel="stylesheet" href="{{ media }}/css/oasisic.css">
-	<link rel="stylesheet" href="{{ media }}/css/oasisic-dark.css" media="(prefers-color-scheme: dark)">
+
 	<link rel="icon" type="image/svg+xml" href="{{ media }}/img/logo.svg">
+	<link rel="stylesheet" href="{{ media }}/css/oasisic.css">
+	<link rel="stylesheet" href="{{ media }}/css/presets.css">
+	<link rel="stylesheet" href="{{ media }}/css/oasisic-dark.css" media="(prefers-color-scheme: dark)">
+
+	{% if (node?.css): %}
+	<link rel="stylesheet" href="{{ resource }}/{{ node.css }}">
+	{% endif -%}
+
+	<script src="{{ dispatcher.build_url('admin/translations', dispatcher.lang) }}?v={{ version.luciversion }}"></script>
+	<script src="{{ resource }}/cbi.js?v={{ version.luciversion }}"></script>
+	<script src="{{ resource }}/luci.js?v={{ version.luciversion }}"></script>
 	<script src="{{ media }}/js/oasisic.js"></script>
 </head>
-<body>
-	<div id="app" class="oasisic-layout">
-		<aside class="oasisic-sidebar">
+<body class="lang_{{ dispatcher.lang }}">
+	<div class="oasisic-layout">
+		<aside class="oasisic-sidebar" id="oasisicSidebar">
 			<div class="oasisic-sidebar-brand">
+				<svg viewBox="0 0 32 32" width="28" height="28" fill="none">
+					<rect x="2" y="2" width="28" height="28" rx="7" fill="#3b82f6"/>
+					<path d="M10 16l4 4 8-8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
 				<span class="oasisic-sidebar-name">Oasisic</span>
 			</div>
 			<nav class="oasisic-sidebar-nav">
-				<ul class="oasisic-nav-list">
-					{% for _, node in ipairs(luci.dispatcher.context.treecache or {}) do %}
-						{% if node.title and node.title ~= "" then %}
-						<li class="oasisic-nav-item">
-							<a href="{{ luci.dispatcher.build_url('admin', node.module) }}" class="oasisic-nav-link">
-								<span class="oasisic-nav-label">{{ translate(node.title) }}</span>
-							</a>
-						</li>
-						{% end %}
-					{% end %}
-				</ul>
+				<ul class="oasisic-nav-list" id="oasisicMenu"></ul>
 			</nav>
+			<div class="oasisic-sidebar-footer">
+				<div class="oasisic-sidebar-version">luci-theme-oasisic v1.0.0</div>
+			</div>
 		</aside>
 		<main id="maincontent" class="oasisic-main">
 			<div class="oasisic-header">
 				<div class="oasisic-header-left">
-					<h2 class="oasisic-page-title">{{ translate("Dashboard") }}</h2>
+					<button class="oasisic-sidebar-toggle" onclick="Oasisic.toggleSidebar()">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<line x1="3" y1="6" x2="21" y2="6"/>
+							<line x1="3" y1="12" x2="21" y2="12"/>
+							<line x1="3" y1="18" x2="21" y2="18"/>
+						</svg>
+					</button>
+					<h2 class="oasisic-page-title">{{ striptags(node?.title ?? '') }}</h2>
 				</div>
 				<div class="oasisic-header-right">
-					<span class="oasisic-version">v{{ ver }}</span>
+					<span class="oasisic-version">v1.0.0</span>
 				</div>
 			</div>
 			<div class="oasisic-content">
+				<noscript>
+					<div class="alert-message error">
+						<h4>{{ _('JavaScript required!') }}</h4>
+						<p>{{ _('You must enable JavaScript in your browser or LuCI will not work properly.') }}</p>
+					</div>
+				</noscript>

@@ -1,7 +1,17 @@
-</div>
-		</main>
-	</div>
+{#
+	luci-theme-oasisic v1.0.0
+	Oasisic OpenWrt
+	Licensed under Apache 2.0
+-#}
+
+			</div><!-- /.oasisic-content -->
+		</main><!-- /#maincontent -->
+	</div><!-- /#app -->
+
 	<script src="{{ media }}/js/dashboard.js"></script>
-	<script>Oasisic.init();</script>
+	<script>
+		Oasisic.init();
+	</script>
+	<script type="text/javascript">L.require('menu-oasisic')</script>
 </body>
 </html>

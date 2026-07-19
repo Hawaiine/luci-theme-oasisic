@@ -48,21 +48,17 @@ define Package/$(PKG_NAME)/install
 	$(CP) ./htdocs/luci-static/oasisic/manifest.json $(1)/www/luci-static/oasisic/
 	$(CP) ./htdocs/luci-static/oasisic/sw.js $(1)/www/luci-static/oasisic/
 
-	# Lua 模板（主题视图路径）
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/themes/oasisic
-	$(CP) ./luasrc/template/themes/oasisic/* $(1)/usr/lib/lua/luci/view/themes/oasisic/
+	# 菜单 JS (L.require 加载)
+	$(INSTALL_DIR) $(1)/www/luci-static/resources
+	$(CP) ./htdocs/luci-static/resources/*.js $(1)/www/luci-static/resources/
 
 	# ucode 模板（主题视图路径）
 	$(INSTALL_DIR) $(1)/usr/share/ucode/luci/view/themes/oasisic
 	$(CP) ./ucode/template/themes/oasisic/* $(1)/usr/share/ucode/luci/view/themes/oasisic/
 
-	# 控制器
+	# 壁纸代理控制器
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller/oasisic
 	$(CP) ./luasrc/controller/oasisic/*.lua $(1)/usr/lib/lua/luci/controller/oasisic/
-
-	# 版本信息
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/dispatcher
-	$(CP) ./luasrc/dispatcher/oasisic.lua $(1)/usr/lib/lua/luci/dispatcher/
 
 	# 主题注册
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
@@ -72,7 +68,7 @@ define Package/$(PKG_NAME)/install
 
 	# 翻译文件
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	$(CP) ./luasrc/controller/oasisic/$(PKG_NAME).zh-cn.lmo $(1)/usr/lib/lua/luci/i18n/
+	$(CP) ./po/zh-cn/$(PKG_NAME).zh-cn.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))

@@ -1,0 +1,17 @@
+{#
+	luci-theme-oasisic v1.0.0 — Login page footer
+	Oasisic OpenWrt
+	Licensed under Apache 2.0
+-#}
+
+	</div>
+	<div class="oasisic-login-wallpaper-credit" id="wallpaperCredit">
+		{{ _('Bing daily wallpaper') }} · 6h
+	</div>
+	<script src="{{ media }}/js/oasisic.js"></script>
+	<script src="{{ media }}/js/login.js"></script>
+	<script>
+		OasisicLogin.init();
+	</script>
+</body>
+</html>
