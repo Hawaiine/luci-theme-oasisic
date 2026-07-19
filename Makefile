@@ -72,7 +72,7 @@ define Package/$(PKG_NAME)/install
 
 	# 翻译文件
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	cp -fpR ./root/usr/lib/lua/luci/i18n/luci-theme-oasisic.lmo $(1)/usr/lib/lua/luci/i18n/ 2>&1; echo "LMO_STATUS: $$?"
+	ls -la ./root/usr/lib/lua/luci/i18n/ 2>&1; cp ./root/usr/lib/lua/luci/i18n/luci-theme-oasisic.lmo $(1)/usr/lib/lua/luci/i18n/ 2>&1; echo "CP_EXIT: $$?"
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
