@@ -5,22 +5,14 @@
 -#}
 
 {%
-	import { readfile, access } from 'fs';
-	import { srand } from 'math';
-
-	const boardinfo = ubus.call("system", "board");
-	const hostname = striptags(boardinfo?.hostname ?? '?');
-
 	http.prepare_content('text/html; charset=UTF-8');
-
-	srand(+substr(reverse(time() + ""), 0, 8));
 %}
 <!DOCTYPE html>
 <html lang="{{ dispatcher.lang }}" data-theme="dark">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<title>{{ hostname }} - {{ _('Login') }}</title>
+	<title>{{ _('Login') }} - Oasisic</title>
 
 	<meta name="robots" content="noindex, nofollow">
 	<meta http-equiv="X-Content-Type-Options" content="nosniff">
