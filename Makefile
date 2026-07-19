@@ -72,7 +72,11 @@ define Package/$(PKG_NAME)/install
 
 	# 翻译文件（预编译的 .lmo 文件）
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	$(CP) ./po/zh-cn/$(PKG_NAME).lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
+	if [ -f "$(PKG_BUILD_DIR)/po/zh-cn/$(PKG_NAME).lmo" ]; then \
+		$(CP) $(PKG_BUILD_DIR)/po/zh-cn/$(PKG_NAME).lmo $(1)/usr/lib/lua/luci/i18n/; \
+	elif [ -f "./po/zh-cn/$(PKG_NAME).lmo" ]; then \
+		$(CP) ./po/zh-cn/$(PKG_NAME).lmo $(1)/usr/lib/lua/luci/i18n/; \
+	fi
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
