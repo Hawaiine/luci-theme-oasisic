@@ -288,7 +288,7 @@ body {
 
 .oasisic-version {
   font-size: 10px;
-  color: var(--text-tertiary);
+  color: rgba(255,255,255,0.35);
   font-weight: 500;
   letter-spacing: 0.2px;
 }

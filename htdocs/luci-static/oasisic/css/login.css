@@ -240,13 +240,13 @@
   justify-content: center;
   gap: 6px;
   margin-top: 28px;
-  color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.35);
   font-size: 10px;
   letter-spacing: 0.2px;
 }
 
 .oasisic-login-ver {
-  color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.35);
   font-weight: 500;
 }
 
