@@ -56,7 +56,8 @@ function ajax_login_check()
     end
 
     -- Validate credentials using OpenWrt's shadow-based auth
-    local valid = sys.checkpasswd(username, password)
+    -- luci.sys.user.checkpasswd calls crypt() comparison against /etc/shadow
+    local valid = sys.user.checkpasswd(username, password)
     if not valid then
         http.write_json({success = false, message = "Invalid username or password"})
         return
