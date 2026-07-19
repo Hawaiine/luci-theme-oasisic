@@ -22,6 +22,12 @@ jobs:
           ./scripts/feeds update -a && ./scripts/feeds install -a
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
           make defconfig
+          # CONFIG_SIGNED_PACKAGES 必须在 defconfig 之后设置
+          # 否则 Kconfig 会检测到 feeds 包中的递归依赖错误
+          echo "CONFIG_SIGNED_PACKAGES=y" >> .config
+          echo "CONFIG_SIGNATURE_CHECK=y" >> .config
+          # 生成 usign 签名密钥（用于 APK 仓库索引签名）
+          usign -G -s key-build -p key-build.pub 2>/dev/null
           make package/luci-theme-oasisic/compile -j$(nproc) V=s 2>&1
       - name: 上传
         uses: actions/upload-artifact@v7
