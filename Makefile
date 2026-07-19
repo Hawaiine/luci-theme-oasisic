@@ -72,7 +72,7 @@ define Package/$(PKG_NAME)/install
 
 	# 翻译文件
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	$(CP) ./root/usr/lib/lua/luci/i18n/*.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
+	-cp -fpR ./root/usr/lib/lua/luci/i18n/luci-theme-oasisic.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
