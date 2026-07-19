@@ -35,6 +35,8 @@ define Build/Configure
 endef
 
 define Build/Compile
+	# 编译翻译文件 .po → .lmo（po2lmo 由 luci-base host 编译提供）
+	$(STAGING_DIR_HOST)/bin/po2lmo ./po/zh-cn/$(PKG_NAME).po ./po/zh-cn/$(PKG_NAME).lmo 2>/dev/null || true
 endef
 
 define Package/$(PKG_NAME)/install
@@ -70,11 +72,9 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
 	$(CP) ./root/usr/share/luci/menu.d/* $(1)/usr/share/luci/menu.d/
 
-	# 翻译文件（由 CI 预编译后安装）
+	# 翻译文件（由 CI 编译后复制到源码目录）
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	for lmo in ./po/*/*.lmo; do \
-		[ -f "$$lmo" ] && $(CP) $$lmo $(1)/usr/lib/lua/luci/i18n/; \
-	done
+	[ -d ./po/zh-cn ] && $(CP) ./po/zh-cn/*.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
