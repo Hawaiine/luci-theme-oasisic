@@ -2,7 +2,7 @@
 	let ver = luci.dispatcher.oasisic.version();
 %}
 <!DOCTYPE html>
-<html lang="{{ luci.i18n.getlang ? luci.i18n.getlang() : 'en' }}" data-theme="{{ L.theme_mode() }}" data-version="{{ ver }}">
+<html lang="{{ luci.i18n.context.lang }}" data-theme="{{ L.theme_mode() }}" data-version="{{ ver }}">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">

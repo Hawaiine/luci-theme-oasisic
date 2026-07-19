@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<%=luci.i18n.getlang and luci.i18n.getlang() or 'en'%>" data-theme="dark" data-sidebar="">
+<html lang="<%=luci.i18n.context.lang%>" data-theme="dark" data-sidebar="">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +17,9 @@
 	<link rel="icon" type="image/svg+xml" href="<%=media%>/img/logo.svg">
 
 	<script src="<%=media%>/js/oasisic.js"></script>
+	<script src="<%=resource%>/luci.js"></script>
+	<script src="<%=resource%>/cbi.js"></script>
+	<script src="<%=url('admin/translations', luci.i18n.context.lang)%>"></script>
 </head>
 <body>
 	<div id="app" class="oasisic-layout">
@@ -152,32 +155,32 @@
 				<div class="oasisic-header-right">
 					<!-- 面包屑导航 -->
 					<%
-										local reqpath = luci.dispatcher.context.requestpath
-										if reqpath and #reqpath > 0 then
-											local parts = {}
-											for i, part in ipairs(reqpath) do
-												local label = part
-												if treecache then
-													for _, node in ipairs(treecache) do
-														if node.module == part then
-															label = luci.i18n.translatef(node.title) or part
-															break
-														end
-														if node.child then
-															for _, child in ipairs(node.child) do
-																if child.module == part then
-																	label = luci.i18n.translatef(child.title) or part
-																	break
+											local reqpath = luci.dispatcher.context.requestpath
+											if reqpath and #reqpath > 0 then
+												local parts = {}
+												for i, part in ipairs(reqpath) do
+													local label = part
+													if treecache then
+														for _, node in ipairs(treecache) do
+															if node.module == part then
+																label = luci.i18n.translatef(node.title) or part
+																break
+															end
+															if node.child then
+																for _, child in ipairs(node.child) do
+																	if child.module == part then
+																		label = luci.i18n.translatef(child.title) or part
+																		break
+																	end
 																end
 															end
 														end
 													end
+													table.insert(parts, '<span class="oasisic-breadcrumb-item">' .. luci.util.pcdata(label) .. '</span>')
 												end
-												table.insert(parts, '<span class="oasisic-breadcrumb-item">' .. luci.util.pcdata(label) .. '</span>')
-											end
-											%>
-											<nav class="oasisic-breadcrumb"><%=table.concat(parts, ' <span class="oasisic-breadcrumb-sep">/</span> ')%></nav>
-										<% end %>
+												%>
+												<nav class="oasisic-breadcrumb"><%=table.concat(parts, ' <span class="oasisic-breadcrumb-sep">/</span> ')%></nav>
+											<% end %>
 					<span class="oasisic-version">v1.0.0</span>
 				</div>
 			</div>
