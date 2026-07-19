@@ -21,8 +21,10 @@ jobs:
           ln -s $GITHUB_WORKSPACE package/luci-theme-oasisic
           ./scripts/feeds update -a && ./scripts/feeds install -a
           echo "CONFIG_PACKAGE_luci-theme-oasisic=y" >> .config
+          echo "CONFIG_SIGNED_PACKAGES=y" >> .config
           make defconfig
-          openssl ecparam -genkey -name prime256v1 -out private-key.pem 2>/dev/null
+          # 生成 APK 签名密钥（usign 格式，非 openssl）
+          make key 2>/dev/null || usign -G -s key-build -p key-build.pub 2>/dev/null || true
           make package/luci-theme-oasisic/compile -j$(nproc) V=s 2>&1
       - name: 上传
         uses: actions/upload-artifact@v7
