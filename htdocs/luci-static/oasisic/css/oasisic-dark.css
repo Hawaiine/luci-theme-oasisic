@@ -1,32 +1,68 @@
 /*!
- * luci-theme-oasisic — Dark mode
- * v1.0.0
+ * Oasisic theme - dark mode.
+ *
+ * The document head sets data-darkmode on <html> before the first paint
+ * (inline, from localStorage + prefers-color-scheme), so this file keys off
+ * that attribute and needs no media query.
  */
 
-[data-theme="dark"],
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-body: #1c1c1e;
-    --bg-card: #2c2c2e;
-    --bg-sidebar: #0f0f11;
-    --bg-input: #3a3a3c;
+html[data-darkmode="true"] {
+  --bg-body: #1c1c1e;
+  --bg-card: #2c2c2e;
+  --bg-sidebar: #0f0f11;
+  --bg-input: #3a3a3c;
 
-    --text-primary: #f5f5f7;
-    --text-secondary: #98989d;
-    --text-tertiary: #636366;
+  --text-primary: #f5f5f7;
+  --text-secondary: #98989d;
+  --text-tertiary: #636366;
 
-    --border-light: rgba(255, 255, 255, 0.06);
-    --border-medium: rgba(255, 255, 255, 0.10);
+  --border-light: rgba(255, 255, 255, 0.06);
+  --border-medium: rgba(255, 255, 255, 0.10);
 
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.25);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
-  }
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
 
-  .oasisic-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
-  .oasisic-btn-secondary { border-color: var(--border-medium); }
-  .oasisic-btn-secondary:hover { background: rgba(255, 255, 255, 0.05); }
+  color-scheme: dark;
+}
 
-  .oasisic-sidebar-brand { border-bottom-color: rgba(255, 255, 255, 0.05); }
-  .oasisic-toggle-slider { background: #3a3a3c; }
+html[data-darkmode="true"] body {
+  background: var(--bg-body);
+  color: var(--text-primary);
+}
+
+html[data-darkmode="true"] .oasisic-btn-secondary { border-color: var(--border-medium); }
+html[data-darkmode="true"] .oasisic-btn-secondary:hover { background: rgba(255, 255, 255, 0.05); }
+html[data-darkmode="true"] .oasisic-sidebar-brand { border-bottom-color: rgba(255, 255, 255, 0.05); }
+
+/* LuCI's own surfaces, so stock pages are readable in the dark */
+html[data-darkmode="true"] .cbi-section,
+html[data-darkmode="true"] .cbi-map,
+html[data-darkmode="true"] .cbi-section-node,
+html[data-darkmode="true"] .cbi-value-field {
+  color: var(--text-primary);
+}
+
+html[data-darkmode="true"] input.cbi-input-text,
+html[data-darkmode="true"] input.cbi-input-password,
+html[data-darkmode="true"] textarea.cbi-input-textarea,
+html[data-darkmode="true"] select.cbi-input-select {
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+}
+
+html[data-darkmode="true"] table.table,
+html[data-darkmode="true"] .cbi-section-table-row {
+  color: var(--text-primary);
+}
+
+html[data-darkmode="true"] .cbi-dropdown > ul.dropdown {
+  background: var(--bg-card);
+  border-color: var(--border-medium);
+}
+
+html[data-darkmode="true"] #modal_overlay .modal {
+  background: var(--bg-card);
+  color: var(--text-primary);
 }

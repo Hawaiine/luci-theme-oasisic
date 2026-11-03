@@ -1,96 +1,72 @@
 {#
-	luci-theme-oasisic v1.0.0 — Login page
-	Oasisic OpenWrt
-	Licensed under Apache 2.0
+ Oasisic theme - login page.
+
+ Rendered with { duser, fuser } for visitors who are not logged in, so it
+ shows nothing about the device: no hostname, model or firmware version.
+ fuser is attacker-controlled (formvalue also reads the query string): it
+ is only tested, never echoed, and the error is generic.
+ The form posts back to the requested URL (no action attribute) with
+ luci_username / luci_password, as the LuCI contract specifies; there is no
+ CSRF field on the login form and no inline data.
 -#}
-
 {%
-	http.prepare_content('text/html; charset=UTF-8');
-%}
+	const lang = entityencode(dispatcher.lang ?? 'en', true);
+-%}
 <!DOCTYPE html>
-<html lang="{{ dispatcher.lang }}" data-theme="dark">
+<html lang="{{ lang }}" data-darkmode="true">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<title>{{ _('Login') }} - Oasisic</title>
-
-	<meta name="robots" content="noindex, nofollow">
-	<meta http-equiv="X-Content-Type-Options" content="nosniff">
-	<meta name="format-detection" content="telephone=no, email=no">
-	<meta name="mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-	<meta name="theme-color" content="#1d1d1f">
-
-	<link rel="stylesheet" href="{{ media }}/css/login.css">
-	<link rel="icon" type="image/svg+xml" href="{{ media }}/img/logo.svg">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="robots" content="noindex, nofollow">
+<title>{{ entityencode(_('Log in'), true) }} · Oasisic</title>
+<script>
+(function (r) {
+	var p = 'auto';
+	try { p = localStorage.getItem('oasisic.theme') || 'auto'; } catch (e) {}
+	var dark = (p === 'dark') || (p !== 'light' &&
+		!!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches));
+	r.setAttribute('data-darkmode', dark ? 'true' : 'false');
+	r.setAttribute('data-theme', p);
+})(document.documentElement);
+</script>
+<link rel="stylesheet" href="{{ media }}/css/login.css">
+<link rel="icon" href="{{ media }}/img/logo.svg" type="image/svg+xml">
 </head>
 <body class="oasisic-login-body">
-	<div class="oasisic-login-wrapper">
-		<div class="oasisic-login-bg" id="loginBg"></div>
-		<div class="oasisic-login-overlay"></div>
-		<div class="oasisic-login-container">
-			<div class="oasisic-login-card">
-				<div class="oasisic-login-header">
-					<svg viewBox="0 0 32 32" width="48" height="48" fill="none">
-						<rect x="2" y="2" width="28" height="28" rx="7" fill="#3b82f6"/>
-						<path d="M10 16l4 4 8-8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-					</svg>
-					<h1>Oasisic</h1>
-				</div>
+<div class="oasisic-login-wrapper">
+	<div class="oasisic-login-bg"></div>
+	<div class="oasisic-login-overlay"></div>
+	<div class="oasisic-login-card{{ fuser ? ' shake' : '' }}">
+		<div class="oasisic-login-brand">
+			<svg class="oasisic-login-logo" viewBox="0 0 32 32" width="44" height="44" aria-hidden="true">
+				<rect x="1" y="1" width="30" height="30" rx="7" class="oasisic-brand-tile"/>
+				<path d="M10 16l4 4 8-8" class="oasisic-brand-mark"/>
+			</svg>
+			<span class="oasisic-login-brand-name">Oasisic</span>
+		</div>
+		<h1 class="oasisic-login-title">{{ entityencode(_('Authorization Required'), true) }}</h1>
 
-				{% if fuser?.default_message: %}
-				<div class="alert-message error">
-					{{ fuser.default_message }}
-				</div>
-				{% endif %}
+{% if (fuser): %}
+		<div class="oasisic-login-error" role="alert">{{ entityencode(_('Invalid username and/or password! Please try again.'), true) }}</div>
+{% endif %}
 
-				<form method="post" action="{{ url('admin/login') }}" class="oasisic-login-form">
-					{{ csrf_token() }}
-					<input type="hidden" name="luci_username" value="{{ fuser?.default ?? 'root' }}">
-					
-					<div class="oasisic-form-group">
-						<label for="luci_username">{{ _('Username') }}</label>
-						<input 
-							type="text" 
-							id="luci_username" 
-							name="luci_username" 
-							value="{{ fuser?.default ?? 'root' }}"
-							autocomplete="username"
-							autofocus
-							required
-						>
-					</div>
+		<form method="post" class="oasisic-login-form">
+			<label class="oasisic-login-field">
+				<span class="oasisic-login-hint">{{ entityencode(_('Username'), true) }}</span>
+				<input type="text" name="luci_username" autocomplete="username" autocapitalize="off" spellcheck="false" required value="{{ entityencode(duser ?? '', true) }}">
+			</label>
+			<label class="oasisic-login-field">
+				<span class="oasisic-login-hint">{{ entityencode(_('Password'), true) }}</span>
+				<input type="password" name="luci_password" autocomplete="current-password" autofocus>
+			</label>
+			<button type="submit" class="oasisic-login-btn">{{ entityencode(_('Log in'), true) }}</button>
+		</form>
 
-					<div class="oasisic-form-group">
-						<label for="luci_password">{{ _('Password') }}</label>
-						<input 
-							type="password" 
-							id="luci_password" 
-							name="luci_password" 
-							autocomplete="current-password"
-							required
-						>
-					</div>
-
-					<button type="submit" class="oasisic-login-button">
-						{{ _('Login') }}
-					</button>
-				</form>
-
-				<div class="oasisic-login-footer">
-					<p>{{ _('Powered by LuCI') }} · Oasisic Theme v1.0.0</p>
-				</div>
-			</div>
+		<div class="oasisic-login-footer">
+			<span class="oasisic-login-ver">Oasisic Theme v1.0.0</span>
 		</div>
 	</div>
-	<div class="oasisic-login-wallpaper-credit" id="wallpaperCredit">
-		{{ _('Bing daily wallpaper') }} · 6h
-	</div>
-	<script src="{{ media }}/js/oasisic.js"></script>
-	<script src="{{ media }}/js/login.js"></script>
-	<script>
-		OasisicLogin.init();
-	</script>
+</div>
 </body>
 </html>

@@ -2,6 +2,13 @@
 # Copyright (C) 2026 Oasisic OpenWrt
 # Licensed under Apache 2.0
 #
+# Standard LuCI theme package: luci.mk maps the tree onto the target
+#   ucode/  -> /usr/share/ucode/luci/     (templates)
+#   htdocs/ -> /www/                       (luci-static assets)
+#   root/   -> /                           (uci-defaults)
+#   po/     -> luci-i18n-oasisic-<lang>    (translation packages, if any)
+# so no manual install rules are needed.
+#
 
 include $(TOPDIR)/rules.mk
 
@@ -10,85 +17,40 @@ PKG_VERSION:=1.0.0
 PKG_RELEASE:=1
 PKG_LICENSE:=Apache-2.0
 PKG_LICENSE_FILES:=LICENSE
-PKG_MAINTAINER:=Noah
 
-LUCI_TITLE:=Oasisic — A modern, elegant LuCI theme
-LUCI_DESCRIPTION:=Apple-inspired minimal design with bypass gateway awareness, Nikki proxy status, daily Bing wallpapers, and full dark/light mode support.
+LUCI_TITLE:=Oasisic theme
+LUCI_DESCRIPTION:=A calm, Apple-inspired LuCI theme: sidebar navigation, \
+	light and dark modes, and a clean login page.
 LUCI_DEPENDS:=+luci-base
+LUCI_MAINTAINER:=Noah <noah@oasisic.dev>
+LUCI_URL:=https://github.com/Hawaiine/luci-theme-oasisic
 
-include $(INCLUDE_DIR)/package.mk
+# The stylesheet uses modern CSS (custom properties, :has(), :is(),
+# color-mix(), clamp()) that csstidy mangles, so it ships as written.
+LUCI_MINIFY_CSS:=0
 
-define Package/$(PKG_NAME)
-  SECTION:=luci
-  CATEGORY:=LuCI
-  SUBMENU:=Themes
-  TITLE:=$(LUCI_TITLE)
-  DEPENDS:=$(LUCI_DEPENDS)
-  PKGARCH:=all
-endef
-
-define Package/$(PKG_NAME)/description
-  $(LUCI_DESCRIPTION)
-endef
-
-define Build/Configure
-endef
-
-define Build/Compile
-endef
-
-define Package/$(PKG_NAME)/install
-	# 静态文件
-	$(INSTALL_DIR) $(1)/www/luci-static/oasisic/css
-	$(INSTALL_DIR) $(1)/www/luci-static/oasisic/js
-	$(INSTALL_DIR) $(1)/www/luci-static/oasisic/img
-	$(CP) ./htdocs/luci-static/oasisic/css/* $(1)/www/luci-static/oasisic/css/
-	$(CP) ./htdocs/luci-static/oasisic/js/* $(1)/www/luci-static/oasisic/js/
-	$(CP) ./htdocs/luci-static/oasisic/img/* $(1)/www/luci-static/oasisic/img/
-	$(CP) ./htdocs/luci-static/oasisic/manifest.json $(1)/www/luci-static/oasisic/
-	$(CP) ./htdocs/luci-static/oasisic/sw.js $(1)/www/luci-static/oasisic/
-
-	# 菜单 JS (L.require 加载)
-	$(INSTALL_DIR) $(1)/www/luci-static/resources
-	$(CP) ./htdocs/luci-static/resources/*.js $(1)/www/luci-static/resources/
-
-	# ucode 模板（主题视图路径）
-	$(INSTALL_DIR) $(1)/usr/share/ucode/luci/view/themes/oasisic
-	$(CP) ./ucode/template/themes/oasisic/* $(1)/usr/share/ucode/luci/view/themes/oasisic/
-
-	# 壁纸代理控制器
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller/oasisic
-	$(CP) ./luasrc/controller/oasisic/*.lua $(1)/usr/lib/lua/luci/controller/oasisic/
-
-	# 主题注册
-	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(CP) ./root/etc/uci-defaults/* $(1)/etc/uci-defaults/
-	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
-	$(CP) ./root/usr/share/luci/menu.d/* $(1)/usr/share/luci/menu.d/
-
-	# 翻译文件
-	$(INSTALL_DIR) $(1)/usr/share/luci/i18n
-	$(CP) ./po/zh-cn/$(PKG_NAME).zh-cn.lmo $(1)/usr/share/luci/i18n/ 2>/dev/null || true
-endef
-
-define Package/$(PKG_NAME)/postinst
+#
+# Never leave LuCI pointing at a theme whose files are gone: on removal,
+# fall back to Bootstrap when it is registered, else to any other
+# registered theme. An upgrade runs postrm too, so skip that case.
+#
+define Package/luci-theme-oasisic/postrm
 #!/bin/sh
+[ "$${1:-}" != upgrade ] && [ "$${PKG_UPGRADE:-}" != 1 ] || exit 0
 [ -n "$${IPKG_INSTROOT}" ] || {
-	uci -q batch <<-EOF >/dev/null
-		set luci.themes.oasisic=/luci-static/oasisic
-		commit luci
-	EOF
-}
-exit 0
-endef
-
-define Package/$(PKG_NAME)/prerm
-#!/bin/sh
-[ -n "$${IPKG_INSTROOT}" ] || {
-	uci -q delete luci.themes.oasisic
+	if [ "$$(uci -q get luci.main.mediaurlbase)" = "/luci-static/oasisic" ]; then
+		alt="$$(uci -q get luci.themes.Bootstrap)"
+		[ -n "$$alt" ] || alt="$$(uci -q show luci.themes | sed -n \"s|^luci\\.themes\\.[A-Za-z0-9_]*='\\(/luci-static/[A-Za-z0-9_.-]*\\)'$$|\\1|p\" | grep -v '^/luci-static/oasisic$$' | head -n 1)"
+		[ -z "$$alt" ] || uci -q set luci.main.mediaurlbase="$$alt"
+	fi
+	uci -q delete luci.themes.Oasisic
 	uci -q commit luci
 }
 exit 0
 endef
 
-$(eval $(call BuildPackage,$(PKG_NAME)))
+# In the LuCI tree (themes/luci-theme-oasisic) use ../../luci.mk; built from
+# an external feed, use the luci feed installed in the build tree.
+include $(if $(wildcard $(CURDIR)/../../luci.mk),$(CURDIR)/../../luci.mk,$(TOPDIR)/feeds/luci/luci.mk)
+
+# call BuildPackage - OpenWrt buildroot signature

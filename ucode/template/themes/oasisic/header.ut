@@ -1,104 +1,101 @@
 {#
-	luci-theme-oasisic v1.0.0
-	Oasisic OpenWrt
-	Licensed under Apache 2.0
+ Oasisic theme - header.
+
+ Follows the LuCI 25.12 theme contract: the theme supplies the document
+ head up to <body>, cbi.js (never luci.js - the core header prints that one
+ plus "L = new LuCI({...})"), #indicators, and an OPEN #maincontent.
+ #view is emitted by the core inside #maincontent and must not appear here.
+ Every request-derived value is entity-encoded, and the page title is only
+ shown to a logged-in session.
 -#}
-
 {%
-	http.prepare_content('text/html; charset=UTF-8');
-%}
+	const authed = !!ctx.authsession;
+	const page_title = (authed && dispatched?.title) ? striptags(_(dispatched.title)) : 'LuCI';
+	const lang = entityencode(dispatcher.lang ?? 'en', true);
+-%}
 <!DOCTYPE html>
-<html lang="{{ dispatcher.lang }}" data-theme="dark">
+<html lang="{{ lang }}" data-darkmode="true" data-theme-color="blue">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<title>{{ striptags(node?.title ?? '') }} - Oasisic</title>
-
-	<meta name="robots" content="noindex, nofollow">
-	<meta http-equiv="X-Content-Type-Options" content="nosniff">
-	<meta http-equiv="X-XSS-Protection" content="1; mode=block">
-	<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-	<meta name="format-detection" content="telephone=no, email=no">
-	<meta name="mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-	<meta name="apple-mobile-web-app-title" content="Oasisic">
-	<meta name="theme-color" content="#1d1d1f">
-
-	<link rel="icon" type="image/svg+xml" href="{{ media }}/img/logo.svg">
-	<link rel="stylesheet" href="{{ media }}/css/oasisic.css">
-	<link rel="stylesheet" href="{{ media }}/css/presets.css">
-	<link rel="stylesheet" href="{{ media }}/css/oasisic-dark.css" media="(prefers-color-scheme: dark)">
-
-	{% if (node?.css): %}
-	<link rel="stylesheet" href="{{ resource }}/{{ node.css }}">
-	{% endif -%}
-
-	<script src="{{ dispatcher.build_url('admin/translations', dispatcher.lang) }}?v={{ version.luciversion }}"></script>
-	<script src="{{ resource }}/cbi.js?v={{ version.luciversion }}"></script>
-	<script src="{{ resource }}/luci.js?v={{ version.luciversion }}"></script>
-	<script src="{{ media }}/js/oasisic.js"></script>
-	<script>
-	// 等待 L 对象就绪后加载菜单
-	(function() {
-		function loadMenu() {
-			if (typeof L !== 'undefined' && L.require) {
-				L.require('menu-oasisic').then(function(MenuModule) {
-					if (typeof MenuModule === 'function') {
-						new MenuModule();
-					}
-				}).catch(function(e) {
-					console.warn('Failed to load menu-oasisic:', e);
-				});
-			} else {
-				setTimeout(loadMenu, 50);
-			}
-		}
-		if (document.readyState === 'loading') {
-			document.addEventListener('DOMContentLoaded', loadMenu);
-		} else {
-			loadMenu();
-		}
-	})();
-	</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="robots" content="noindex, nofollow">
+<title>{{ entityencode(page_title, true) }} · Oasisic</title>
+<script>
+(function (r) {
+	var p = 'auto', side = '';
+	try {
+		p = localStorage.getItem('oasisic.theme') || 'auto';
+		side = localStorage.getItem('oasisic.sidebar') || '';
+	} catch (e) {}
+	var dark = (p === 'dark') || (p !== 'light' &&
+		!!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches));
+	r.setAttribute('data-darkmode', dark ? 'true' : 'false');
+	r.setAttribute('data-theme', p);
+	if (side === 'collapsed') r.setAttribute('data-sidebar', 'collapsed');
+})(document.documentElement);
+</script>
+<link rel="stylesheet" href="{{ media }}/css/luci-base.css">
+<link rel="stylesheet" href="{{ media }}/css/luci-mobile.css">
+<link rel="stylesheet" href="{{ media }}/css/oasisic.css">
+<link rel="stylesheet" href="{{ media }}/css/shell.css">
+<link rel="stylesheet" href="{{ media }}/css/presets.css">
+<link rel="stylesheet" href="{{ media }}/css/oasisic-dark.css">
+<link rel="icon" href="{{ media }}/img/logo.svg" type="image/svg+xml">
+<script src="{{ entityencode(dispatcher.build_url('admin/translations', dispatcher.lang), true) }}"></script>
+<script src="{{ resource }}/cbi.js"></script>
 </head>
-<body class="lang_{{ dispatcher.lang }}">
-	<div class="oasisic-layout">
-		<aside class="oasisic-sidebar" id="oasisicSidebar">
-			<div class="oasisic-sidebar-brand">
-				<svg viewBox="0 0 32 32" width="28" height="28" fill="none">
-					<rect x="2" y="2" width="28" height="28" rx="7" fill="#3b82f6"/>
-					<path d="M10 16l4 4 8-8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-				</svg>
-				<span class="oasisic-sidebar-name">Oasisic</span>
+<body class="lang_{{ lang }}{{ authed ? ' oasisic-authed' : ' oasisic-anon' }}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}">
+{% if (blank_page): %}
+<div id="indicators" hidden></div>
+<div id="maincontent" class="oasisic-main oasisic-main-blank">
+{% else %}
+<a class="oasisic-skip" href="#maincontent">{{ entityencode(_('Skip to content'), true) }}</a>
+<div class="oasisic-layout">
+{% if (authed): %}
+	<aside class="oasisic-sidebar" id="oasisic-sidebar">
+		<div class="oasisic-sidebar-brand">
+			<svg class="oasisic-sidebar-logo" viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+				<rect x="1" y="1" width="30" height="30" rx="7" class="oasisic-brand-tile"/>
+				<path d="M10 16l4 4 8-8" class="oasisic-brand-mark"/>
+			</svg>
+			<span class="oasisic-sidebar-name">Oasisic</span>
+		</div>
+		<nav class="oasisic-nav" aria-label="{{ entityencode(_('Main navigation'), true) }}">
+			<ul class="oasisic-nav-list" id="oasisic-menu"></ul>
+		</nav>
+		<div class="oasisic-sidebar-spacer"></div>
+		<div class="oasisic-sidebar-footer">
+			<span class="oasisic-sidebar-footer-text">{{ entityencode(version.distname ?? 'OpenWrt', true) }}</span>
+		</div>
+	</aside>
+{% endif %}
+	<main id="maincontent" class="oasisic-main">
+		<div class="oasisic-header">
+			<div class="oasisic-header-left">
+{% if (authed): %}
+				<button type="button" class="oasisic-sidebar-toggle" id="oasisic-toggle" aria-label="{{ entityencode(_('Toggle navigation'), true) }}" aria-expanded="true">
+					<span></span><span></span><span></span>
+				</button>
+{% endif %}
+				<h2 class="oasisic-page-title">{{ entityencode(page_title, true) }}</h2>
 			</div>
-			<nav class="oasisic-sidebar-nav">
-				<ul class="oasisic-nav-list" id="oasisicMenu"></ul>
-			</nav>
-			<div class="oasisic-sidebar-footer">
-				<div class="oasisic-sidebar-version">luci-theme-oasisic v1.0.0</div>
+			<div class="oasisic-header-right">
+				<div id="indicators" class="oasisic-indicators" aria-live="polite"></div>
+{% if (authed): %}
+				<button type="button" class="oasisic-icon-btn" id="oasisic-theme-btn" aria-label="{{ entityencode(_('Toggle appearance'), true) }}" title="{{ entityencode(_('Toggle appearance'), true) }}">
+					<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+						<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" class="oasisic-fill"/>
+					</svg>
+				</button>
+				<a class="oasisic-icon-btn" href="{{ dispatcher.build_url('admin/logout') }}" aria-label="{{ entityencode(_('Log out'), true) }}" title="{{ entityencode(_('Log out'), true) }}">
+					<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+						<path d="M14 4h4.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H14"/>
+						<path d="M10 8l-4 4 4 4M6 12h10"/>
+					</svg>
+				</a>
+{% endif %}
 			</div>
-		</aside>
-		<main id="maincontent" class="oasisic-main">
-			<div class="oasisic-header">
-				<div class="oasisic-header-left">
-					<button class="oasisic-sidebar-toggle" onclick="Oasisic.toggleSidebar()">
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<line x1="3" y1="6" x2="21" y2="6"/>
-							<line x1="3" y1="12" x2="21" y2="12"/>
-							<line x1="3" y1="18" x2="21" y2="18"/>
-						</svg>
-					</button>
-					<h2 class="oasisic-page-title">{{ striptags(node?.title ?? '') }}</h2>
-				</div>
-				<div class="oasisic-header-right">
-					<span class="oasisic-version">v1.0.0</span>
-				</div>
-			</div>
-			<div class="oasisic-content">
-				<noscript>
-					<div class="alert-message error">
-						<h4>{{ _('JavaScript required!') }}</h4>
-						<p>{{ _('You must enable JavaScript in your browser or LuCI will not work properly.') }}</p>
-					</div>
-				</noscript>
+		</div>
+		<div class="oasisic-content">
+{% endif %}
