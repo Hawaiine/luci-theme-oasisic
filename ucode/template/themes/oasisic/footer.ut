@@ -6,12 +6,11 @@
 
 			</div><!-- /.oasisic-content -->
 		</main><!-- /#maincontent -->
-	</div><!-- /#app -->
+	</div><!-- /.oasisic-layout -->
 
 	<script src="{{ media }}/js/dashboard.js"></script>
 	<script>
 		Oasisic.init();
 	</script>
-	<script type="text/javascript">L.require('menu-oasisic')</script>
 </body>
 </html>

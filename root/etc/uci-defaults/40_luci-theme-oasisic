@@ -3,8 +3,8 @@
 # Reference: OpenWrt luci-theme-bootstrap root/etc/uci-defaults/30_luci-theme-bootstrap
 
 uci -q batch <<-EOF
-  set luci.themes.oasisic=/luci-static/oasisic
-  commit luci
+	set luci.themes.oasisic=/luci-static/oasisic
+	commit luci
 EOF
 
 exit 0

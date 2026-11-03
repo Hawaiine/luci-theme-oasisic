@@ -4,12 +4,20 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+  pull_request:
+    paths:
+      - '**.lua'
+      - '**.ut'
+      - '**.js'
+      - '**.css'
+      - 'Makefile'
+      - '.github/workflows/build.yml'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
       - name: 下载 SDK
         run: |
           wget -q -O sdk.tar.zst https://downloads.openwrt.org/releases/25.12.5/targets/x86/64/openwrt-sdk-25.12.5-x86-64_gcc-14.3.0_musl.Linux-x86_64.tar.zst
@@ -38,8 +46,19 @@ jobs:
             # 后备：用 usign 签名仓库索引
             $SDK_USIGN -S -s key-build -m "$APK_FILE" -o "$APK_FILE.sig" 2>/dev/null || true
           fi
+      - name: 验证产物
+        run: |
+          APK_FILE=$(ls sdk/bin/packages/x86_64/base/luci-theme-oasisic*.apk 2>/dev/null | head -1)
+          if [ -z "$APK_FILE" ]; then
+            echo "❌ APK 文件未生成"
+            exit 1
+          fi
+          echo "✅ APK 文件: $(basename $APK_FILE)"
+          echo "📦 大小: $(du -h $APK_FILE | cut -f1)"
+          # 解压检查关键路径
+          tar -tzf "$APK_FILE" | grep -E '(www/luci-static/oasisic|usr/share/ucode/luci/view/themes/oasisic|etc/uci-defaults)' || echo "⚠️ 部分路径缺失"
       - name: 上传
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: oasisic-x86_64-25.12
           path: |

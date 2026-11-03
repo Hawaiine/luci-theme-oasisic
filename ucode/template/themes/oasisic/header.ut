@@ -38,6 +38,29 @@
 	<script src="{{ resource }}/cbi.js?v={{ version.luciversion }}"></script>
 	<script src="{{ resource }}/luci.js?v={{ version.luciversion }}"></script>
 	<script src="{{ media }}/js/oasisic.js"></script>
+	<script>
+	// 等待 L 对象就绪后加载菜单
+	(function() {
+		function loadMenu() {
+			if (typeof L !== 'undefined' && L.require) {
+				L.require('menu-oasisic').then(function(MenuModule) {
+					if (typeof MenuModule === 'function') {
+						new MenuModule();
+					}
+				}).catch(function(e) {
+					console.warn('Failed to load menu-oasisic:', e);
+				});
+			} else {
+				setTimeout(loadMenu, 50);
+			}
+		}
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', loadMenu);
+		} else {
+			loadMenu();
+		}
+	})();
+	</script>
 </head>
 <body class="lang_{{ dispatcher.lang }}">
 	<div class="oasisic-layout">

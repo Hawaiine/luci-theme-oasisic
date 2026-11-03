@@ -5,16 +5,16 @@
 
 include $(TOPDIR)/rules.mk
 
-LUCI_TITLE:=Oasisic — A modern, elegant LuCI theme
-LUCI_DESCRIPTION:=Apple-inspired minimal design with bypass gateway awareness, Nikki proxy status, daily Bing wallpapers, and full dark/light mode support.
-LUCI_DEPENDS:=+luci-base
-
 PKG_NAME:=luci-theme-oasisic
 PKG_VERSION:=1.0.0
 PKG_RELEASE:=1
 PKG_LICENSE:=Apache-2.0
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Noah
+
+LUCI_TITLE:=Oasisic — A modern, elegant LuCI theme
+LUCI_DESCRIPTION:=Apple-inspired minimal design with bypass gateway awareness, Nikki proxy status, daily Bing wallpapers, and full dark/light mode support.
+LUCI_DEPENDS:=+luci-base
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -67,8 +67,28 @@ define Package/$(PKG_NAME)/install
 	$(CP) ./root/usr/share/luci/menu.d/* $(1)/usr/share/luci/menu.d/
 
 	# 翻译文件
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	$(CP) ./po/zh-cn/$(PKG_NAME).zh-cn.lmo $(1)/usr/lib/lua/luci/i18n/ 2>/dev/null || true
+	$(INSTALL_DIR) $(1)/usr/share/luci/i18n
+	$(CP) ./po/zh-cn/$(PKG_NAME).zh-cn.lmo $(1)/usr/share/luci/i18n/ 2>/dev/null || true
+endef
+
+define Package/$(PKG_NAME)/postinst
+#!/bin/sh
+[ -n "$${IPKG_INSTROOT}" ] || {
+	uci -q batch <<-EOF >/dev/null
+		set luci.themes.oasisic=/luci-static/oasisic
+		commit luci
+	EOF
+}
+exit 0
+endef
+
+define Package/$(PKG_NAME)/prerm
+#!/bin/sh
+[ -n "$${IPKG_INSTROOT}" ] || {
+	uci -q delete luci.themes.oasisic
+	uci -q commit luci
+}
+exit 0
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
