@@ -95,6 +95,36 @@ for css in htdocs/luci-static/oasisic/css/*.css; do
 	if [ "$open" -eq "$close" ]; then ok "braces $css ($open)"; else bad "braces $css ($open/$close)"; fi
 done
 
+
+echo '== icons.css 与图标文件一致性 =='
+if [ -f htdocs/luci-static/oasisic/icons.css ]; then
+	ok "icons.css exists"
+	missing=0
+	for ref in $(grep -oE 'icons/(network|menu)/(light|dark)/[a-z0-9_-]+\.svg' htdocs/luci-static/oasisic/icons.css | sort -u); do
+		[ -f "htdocs/luci-static/oasisic/$ref" ] || { bad "icons.css references missing $ref"; missing=$((missing+1)); }
+	done
+	[ "$missing" -eq 0 ] && ok "all icon refs resolve"
+else
+	bad "icons.css is missing"
+fi
+
+echo '== 图标数量 =='
+for d in network menu; do
+	for t in light dark; do
+		n=$(ls htdocs/luci-static/oasisic/icons/$d/$t/*.svg 2>/dev/null | wc -l)
+		if [ "$n" -gt 0 ]; then ok "icons/$d/$t: $n svg"; else bad "icons/$d/$t: empty"; fi
+	done
+done
+
+echo '== 侧栏选中态 CSS 存在 =='
+need "htdocs/luci-static/oasisic/css/shell.css" 'oasisic-nav-item\.active' 'sidebar active state styled'
+need "htdocs/luci-static/oasisic/css/shell.css" 'oasisic-nav-link\.active' 'sidebar link active styled'
+
+echo '== i18n 结构与模板域一致 =='
+if [ -f po/templates/oasisic-theme.pot ]; then ok 'po template exists'; else bad 'po template missing'; fi
+if [ -f po/zh_Hans/oasisic-theme.po ]; then ok 'zh_Hans translation exists'; else bad 'zh_Hans translation missing'; fi
+if grep -q "'oasisic-theme'" ucode/template/themes/oasisic/header.ut 2>/dev/null; then ok 'theme strings carry the domain'; else bad 'theme strings lack the domain'; fi
+
 echo
 if [ "$fail" -eq 0 ]; then
 	echo "RESULT: PASS (all contract checks)"
