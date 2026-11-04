@@ -39,8 +39,8 @@
 <link rel="stylesheet" href="{{ media }}/css/luci-mobile.css">
 <link rel="stylesheet" href="{{ media }}/css/oasisic.css">
 <link rel="stylesheet" href="{{ media }}/css/shell.css">
-<link rel="stylesheet" href="{{ media }}/css/presets.css">
 <link rel="stylesheet" href="{{ media }}/css/oasisic-dark.css">
+<link rel="stylesheet" href="{{ media }}/icons.css">
 <link rel="icon" href="{{ media }}/img/logo.svg" type="image/svg+xml">
 <script src="{{ entityencode(dispatcher.build_url('admin/translations', dispatcher.lang), true) }}"></script>
 <script src="{{ resource }}/cbi.js"></script>

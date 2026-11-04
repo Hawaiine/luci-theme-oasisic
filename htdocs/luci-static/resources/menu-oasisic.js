@@ -19,55 +19,61 @@ var ICONS = {
 	             [ 'rect', { x: '3', y: '16', width: '6', height: '5', rx: '1' } ],
 	             [ 'rect', { x: '15', y: '16', width: '6', height: '5', rx: '1' } ],
 	             [ 'path', { d: 'M12 8v4M6 16v-2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2' } ] ],
-	services:  [ [ 'rect', { x: '4', y: '4', width: '7', height: '7', rx: '1.5' } ],
-	             [ 'rect', { x: '13', y: '4', width: '7', height: '7', rx: '1.5' } ],
-	             [ 'rect', { x: '4', y: '13', width: '7', height: '7', rx: '1.5' } ],
-	             [ 'path', { d: 'M16.5 13v7M13 16.5h7' } ] ],
-	system:    [ [ 'rect', { x: '5.5', y: '5.5', width: '13', height: '13', rx: '2' } ],
-	             [ 'rect', { x: '9.5', y: '9.5', width: '5', height: '5', rx: '.8' } ],
-	             [ 'path', { d: 'M9.5 2.5v3M14.5 2.5v3M9.5 18.5v3M14.5 18.5v3M2.5 9.5h3M2.5 14.5h3M18.5 9.5h3M18.5 14.5h3' } ] ],
-	vpn:       [ [ 'path', { d: 'M12 3 5 6v5c0 4.5 3 8.2 7 10 4-1.8 7-5.5 7-10V6z' } ],
-	             [ 'path', { d: 'm9 12 2 2 4-4' } ] ],
-	statistics:[ [ 'path', { d: 'M5 20v-8M10 20V5M15 20v-5M20 20V9M3 20.5h18' } ] ],
-	generic:   [ [ 'circle', { cx: '12', cy: '12', r: '8' } ],
-	             [ 'circle', { cx: '12', cy: '12', r: '2.2' } ] ]
+	system:    [ [ 'circle', { cx: '12', cy: '12', r: '3' } ],
+	             [ 'path', { d: 'M12 1v3m0 16v3M4.22 4.22l2.12 2.12m11.32 11.32l2.12 2.12M1 12h3m16 0h3M4.22 19.78l2.12-2.12m11.32-11.32l2.12-2.12' } ] ],
+	services:  [ [ 'rect', { x: '3', y: '3', width: '7', height: '7', rx: '1' } ],
+	             [ 'rect', { x: '14', y: '3', width: '7', height: '7', rx: '1' } ],
+	             [ 'rect', { x: '14', y: '14', width: '7', height: '7', rx: '1' } ],
+	             [ 'rect', { x: '3', y: '14', width: '7', height: '7', rx: '1' } ] ],
+	logout:    [ [ 'path', { d: 'M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4' } ],
+	             [ 'polyline', { points: '16 17 21 12 16 7' } ],
+	             [ 'line', { x1: '21', y1: '12', x2: '9', y2: '12' } ] ],
+	vpn:       [ [ 'rect', { x: '3', y: '11', width: '18', height: '11', rx: '2', ry: '2' } ],
+	             [ 'path', { d: 'M7 11V7a5 5 0 0110 0v4' } ] ],
+	firewall:  [ [ 'rect', { x: '4', y: '4', width: '16', height: '16', rx: '2' } ],
+	             [ 'path', { d: 'M9 9h6M9 13h6M9 17h2' } ] ],
+	nas:       [ [ 'ellipse', { cx: '12', cy: '5', rx: '9', ry: '3' } ],
+	             [ 'path', { d: 'M21 12c0 1.66-4 3-9 3s-9-1.34-9-3' } ],
+	             [ 'path', { d: 'M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5' } ] ],
+	wifi:      [ [ 'path', { d: 'M5 12.55a11 11 0 0114.08 0' } ],
+	             [ 'path', { d: 'M1.42 9a16 16 0 0121.16 0' } ],
+	             [ 'path', { d: 'M8.53 16.11a6 6 0 016.95 0' } ],
+	             [ 'line', { x1: '12', y1: '20', x2: '12.01', y2: '20' } ] ],
+	nvim:      [ [ 'rect', { x: '2', y: '3', width: '20', height: '14', rx: '2' } ],
+	             [ 'path', { d: 'M6 7h.01M10 7h.01M14 7h.01' } ] ],
+	generic:   [ [ 'circle', { cx: '12', cy: '12', r: '10' } ],
+	             [ 'path', { d: 'M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3' } ],
+	             [ 'line', { x1: '12', y1: '17', x2: '12.01', y2: '17' } ] ]
 };
 
-var SVGNS = 'http://www.w3.org/2000/svg';
-
-/* Tags and attribute names are closed sets written as literals: anything
-   else throws, so no caller can create script/a/foreignObject or set href,
-   style or an on* handler through this helper. */
 function svgNode(tag) {
-	switch (tag) {
-	case 'svg': return document.createElementNS(SVGNS, 'svg');
-	case 'path': return document.createElementNS(SVGNS, 'path');
-	case 'rect': return document.createElementNS(SVGNS, 'rect');
-	case 'circle': return document.createElementNS(SVGNS, 'circle');
-	}
-	throw new Error('svg: tag not allowed: ' + tag);
+	return document.createElementNS('http://www.w3.org/2000/svg', tag);
 }
 
 function svgAttr(el, k, v) {
 	switch (k) {
-	case 'viewBox': el.setAttribute('viewBox', String(v)); break;
-	case 'width': el.setAttribute('width', String(v)); break;
-	case 'height': el.setAttribute('height', String(v)); break;
-	case 'class': el.setAttribute('class', String(v)); break;
-	case 'd': el.setAttribute('d', String(v)); break;
-	case 'x': case 'y': case 'rx': case 'cx': case 'cy': case 'r':
-		el.setAttribute(k, String(v)); break;
-	default: throw new Error('svg: attribute not allowed: ' + k);
+	case 'd': case 'x': case 'y': case 'x1': case 'y1': case 'x2': case 'y2':
+	case 'cx': case 'cy': case 'r': case 'rx': case 'ry':
+	case 'width': case 'height': case 'viewBox': case 'points':
+	case 'stroke': case 'stroke-width': case 'stroke-linecap': case 'stroke-linejoin':
+	case 'fill': case 'fill-rule': case 'class':
+		el.setAttribute(k, v);
+		break;
 	}
 }
 
-function svgIcon(name) {
+function svgIcon(iconKey) {
+	var parts = ICONS[iconKey] || ICONS['generic'];
 	var s = svgNode('svg');
 	svgAttr(s, 'viewBox', '0 0 24 24');
-	svgAttr(s, 'width', 18);
-	svgAttr(s, 'height', 18);
-	svgAttr(s, 'class', 'oasisic-nav-icon');
-	(ICONS[name] || ICONS.generic).forEach(function (part) {
+	svgAttr(s, 'width', '20');
+	svgAttr(s, 'height', '20');
+	svgAttr(s, 'stroke', 'currentColor');
+	svgAttr(s, 'stroke-width', '1.5');
+	svgAttr(s, 'stroke-linecap', 'round');
+	svgAttr(s, 'stroke-linejoin', 'round');
+	svgAttr(s, 'fill', 'none');
+	parts.forEach(function (part) {
 		var el = svgNode(part[0]);
 		Object.keys(part[1]).forEach(function (k) { svgAttr(el, k, part[1][k]); });
 		s.appendChild(el);
@@ -78,7 +84,10 @@ function svgIcon(name) {
 function iconFor(node) {
 	var name = String(node.name || '');
 	if (ICONS[name]) return name;
-	if (/^(vpn|services)$/.test(name)) return 'services';
+	if (/^(vpn|ipsec|openvpn|wireguard)$/i.test(name)) return 'vpn';
+	if (/^(services|startup)$/i.test(name)) return 'services';
+	if (/^(nas|storage|mount)$/i.test(name)) return 'nas';
+	if (/^(wireless|wifi)$/i.test(name)) return 'wifi';
 	return 'generic';
 }
 
@@ -99,7 +108,8 @@ return baseclass.extend({
 		var self = this;
 
 		children.forEach(function (node) {
-			var active = (dispatch[0] === node.name);
+			// FIX: dispatch[0] is always 'admin'; compare dispatch[1] against node.name
+			var active = (dispatch[1] === node.name);
 
 			var link = E('a', {
 				'class': 'oasisic-nav-link' + (active ? ' active' : ''),
@@ -122,7 +132,7 @@ return baseclass.extend({
 
 		var ul = E('ul', { 'class': 'oasisic-nav-submenu' });
 		children.forEach(function (child) {
-			var active = (dispatch[1] === child.name);
+			var active = (dispatch[2] === child.name);
 			ul.appendChild(E('li', { 'class': 'oasisic-nav-subitem' }, [
 				E('a', {
 					'class': 'oasisic-nav-sublink' + (active ? ' active' : ''),
