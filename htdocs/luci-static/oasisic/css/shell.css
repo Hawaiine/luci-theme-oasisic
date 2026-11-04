@@ -64,11 +64,25 @@
   color: #fff;
   text-decoration: none;
 }
-.oasisic-nav-item.active > .oasisic-nav-link {
-  background: rgba(255, 255, 255, 0.10);
+.oasisic-nav-item.active > .oasisic-nav-link,
+.oasisic-nav-link.active {
+  position: relative;
+  background: rgba(255, 255, 255, 0.14);
   color: #fff;
+  font-weight: 600;
 }
-.oasisic-nav-link.active { background: rgba(255, 255, 255, 0.10); color: #fff; }
+.oasisic-nav-item.active > .oasisic-nav-link::before,
+.oasisic-nav-link.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--primary);
+  border-radius: 0 3px 3px 0;
+}
 
 .oasisic-nav-icon {
   flex: 0 0 auto;

@@ -786,16 +786,35 @@ table tr:hover td,
 
 /* 进度条 */
 .cbi-progressbar {
-  height: 6px;
-  background: var(--border-light);
-  border-radius: 3px;
+  position: relative;
+  height: 22px;
+  max-width: 520px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
   overflow: hidden;
 }
-.cbi-progressbar-value {
+.cbi-progressbar > div {
   height: 100%;
-  background: var(--primary);
-  border-radius: 3px;
-  transition: width 0.3s;
+  width: 0;
+  background: linear-gradient(90deg, 
+    color-mix(in srgb, var(--primary) 85%, transparent),
+    color-mix(in srgb, var(--primary) 65%, transparent));
+  transition: width 0.3s ease-out;
+}
+.cbi-progressbar::before {
+  content: attr(title);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  white-space: nowrap;
+  z-index: 1;
 }
 
 /* 选择框 */

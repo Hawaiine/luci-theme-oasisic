@@ -50,7 +50,7 @@
 <div id="indicators" hidden></div>
 <div id="maincontent" class="oasisic-main oasisic-main-blank">
 {% else %}
-<a class="oasisic-skip" href="#maincontent">{{ entityencode(_('Skip to content'), true) }}</a>
+<a class="oasisic-skip" href="#maincontent">{{ entityencode(_('Skip to content', 'oasisic-theme'), true) }}</a>
 <div class="oasisic-layout">
 {% if (authed): %}
 	<aside class="oasisic-sidebar" id="oasisic-sidebar">
@@ -61,7 +61,7 @@
 			</svg>
 			<span class="oasisic-sidebar-name">Oasisic</span>
 		</div>
-		<nav class="oasisic-nav" aria-label="{{ entityencode(_('Main navigation'), true) }}">
+		<nav class="oasisic-nav" aria-label="{{ entityencode(_('Main navigation', 'oasisic-theme'), true) }}">
 			<ul class="oasisic-nav-list" id="oasisic-menu"></ul>
 		</nav>
 		<div class="oasisic-sidebar-spacer"></div>
@@ -74,7 +74,7 @@
 		<div class="oasisic-header">
 			<div class="oasisic-header-left">
 {% if (authed): %}
-				<button type="button" class="oasisic-sidebar-toggle" id="oasisic-toggle" aria-label="{{ entityencode(_('Toggle navigation'), true) }}" aria-expanded="true">
+				<button type="button" class="oasisic-sidebar-toggle" id="oasisic-toggle" aria-label="{{ entityencode(_('Toggle navigation', 'oasisic-theme'), true) }}" aria-expanded="true">
 					<span></span><span></span><span></span>
 				</button>
 {% endif %}
@@ -83,12 +83,12 @@
 			<div class="oasisic-header-right">
 				<div id="indicators" class="oasisic-indicators" aria-live="polite"></div>
 {% if (authed): %}
-				<button type="button" class="oasisic-icon-btn" id="oasisic-theme-btn" aria-label="{{ entityencode(_('Toggle appearance'), true) }}" title="{{ entityencode(_('Toggle appearance'), true) }}">
+				<button type="button" class="oasisic-icon-btn" id="oasisic-theme-btn" aria-label="{{ entityencode(_('Toggle appearance', 'oasisic-theme'), true) }}" title="{{ entityencode(_('Toggle appearance', 'oasisic-theme'), true) }}">
 					<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
 						<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" class="oasisic-fill"/>
 					</svg>
 				</button>
-				<a class="oasisic-icon-btn" href="{{ dispatcher.build_url('admin/logout') }}" aria-label="{{ entityencode(_('Log out'), true) }}" title="{{ entityencode(_('Log out'), true) }}">
+				<a class="oasisic-icon-btn" href="{{ dispatcher.build_url('admin/logout') }}" aria-label="{{ entityencode(_('Log out', 'oasisic-theme'), true) }}" title="{{ entityencode(_('Log out', 'oasisic-theme'), true) }}">
 					<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
 						<path d="M14 4h4.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H14"/>
 						<path d="M10 8l-4 4 4 4M6 12h10"/>
