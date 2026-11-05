@@ -1,0 +1,219 @@
+/*!
+ * Oasisic theme - application shell.
+ *
+ * Layout wiring for the mark-up the templates emit: sidebar, top bar,
+ * indicators, footer, the collapsed/off-canvas states the shell script
+ * drives from <html data-sidebar> / <html data-sidebar-open>, and small
+ * fixes so LuCI's own widgets keep their spacing inside the shell.
+ * Loaded after oasisic.css (design tokens) and luci-base.css (core rules).
+ */
+
+/* ---------- accessibility helpers ---------- */
+.oasisic-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 300;
+  padding: 8px 14px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+.oasisic-skip:focus { left: 0; }
+
+/* ---------- brand mark ---------- */
+.oasisic-brand-tile { fill: var(--primary); }
+.oasisic-brand-mark {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---------- navigation ---------- */
+.oasisic-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 8px;
+}
+.oasisic-nav-list,
+.oasisic-nav-submenu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.oasisic-nav-item { margin: 2px 0; }
+
+.oasisic-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.oasisic-nav-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  text-decoration: none;
+}
+.oasisic-nav-item.active > .oasisic-nav-link,
+.oasisic-nav-link.active {
+  position: relative;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-weight: 600;
+}
+.oasisic-nav-item.active > .oasisic-nav-link::before,
+.oasisic-nav-link.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--primary);
+  border-radius: 0 3px 3px 0;
+}
+
+.oasisic-nav-icon {
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.9;
+}
+.oasisic-nav-label { overflow: hidden; text-overflow: ellipsis; }
+
+.oasisic-nav-submenu {
+  margin: 2px 0 6px 20px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+.oasisic-nav-subitem { margin: 1px 0; }
+.oasisic-nav-sublink {
+  display: block;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oasisic-nav-sublink:hover { background: rgba(255, 255, 255, 0.05); color: #fff; text-decoration: none; }
+.oasisic-nav-sublink.active { color: #fff; background: rgba(255, 255, 255, 0.07); }
+
+.oasisic-sidebar-spacer { flex: 0 0 8px; }
+
+/* ---------- top bar actions ---------- */
+.oasisic-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.oasisic-icon-btn:hover { color: var(--text-primary); border-color: var(--text-tertiary); text-decoration: none; }
+.oasisic-icon-btn svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.oasisic-icon-btn .oasisic-fill { fill: currentColor; stroke: none; }
+
+/* Indicators sit in the top bar; LuCI writes div.alert-message children
+ * there (uci-changes, poll-status, media_error). Keep them compact and
+ * beside the buttons instead of full width. */
+.oasisic-indicators {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.oasisic-indicators:empty { display: none; }
+.oasisic-indicators .alert-message,
+.oasisic-indicators .label {
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+/* ---------- footer ---------- */
+.oasisic-foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px var(--space-xl) 26px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+.oasisic-foot-sep { opacity: 0.5; }
+
+/* ---------- content area: let stock pages use the full width ---------- */
+.oasisic-content > #view { width: 100%; }
+.oasisic-content > #view > .cbi-map,
+.oasisic-content > #view > .cbi-section { max-width: none; }
+.oasisic-main-blank { margin-left: 0 !important; padding: var(--space-lg); }
+.oasisic-anon .oasisic-main { margin-left: 0; }
+
+/* ---------- collapsed sidebar (desktop) ---------- */
+html[data-sidebar="collapsed"] .oasisic-sidebar { width: var(--sidebar-collapsed-width); }
+html[data-sidebar="collapsed"] .oasisic-sidebar-name,
+html[data-sidebar="collapsed"] .oasisic-sidebar-footer,
+html[data-sidebar="collapsed"] .oasisic-nav-label,
+html[data-sidebar="collapsed"] .oasisic-nav-submenu { display: none; }
+html[data-sidebar="collapsed"] .oasisic-nav-link { justify-content: center; padding: 10px 0; }
+html[data-sidebar="collapsed"] .oasisic-main { margin-left: var(--sidebar-collapsed-width); }
+html[data-sidebar="collapsed"] .oasisic-sidebar-brand { justify-content: center; padding-left: 0; padding-right: 0; }
+
+/* ---------- off-canvas sidebar (phones and narrow tablets) ---------- */
+@media (max-width: 900px) {
+  .oasisic-sidebar {
+    width: var(--sidebar-width);
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    box-shadow: none;
+  }
+  html[data-sidebar-open="true"] .oasisic-sidebar {
+    transform: translateX(0);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  }
+  html[data-sidebar-open="true"] .oasisic-main::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 90;
+  }
+  .oasisic-main { margin-left: 0; }
+  html[data-sidebar="collapsed"] .oasisic-main { margin-left: 0; }
+  html[data-sidebar="collapsed"] .oasisic-sidebar-name,
+  html[data-sidebar="collapsed"] .oasisic-nav-label { display: inline; }
+  html[data-sidebar="collapsed"] .oasisic-nav-submenu { display: block; }
+  .oasisic-main { padding: var(--space-lg); }
+}
+
+@media (max-width: 520px) {
+  .oasisic-header { flex-wrap: wrap; gap: var(--space-sm); }
+  .oasisic-page-title { font-size: var(--font-size-lg); }
+  .oasisic-indicators { order: 3; width: 100%; }
+}

@@ -1,17 +1,32 @@
 {#
-	luci-theme-oasisic v1.0.0
-	Oasisic OpenWrt
-	Licensed under Apache 2.0
+ Oasisic theme - footer.
+
+ Closes #maincontent and the shell the header opened, prints a short footer
+ for logged-in sessions only (error pages reach anonymous visitors too),
+ then loads the shell script. The menu script is required only for a
+ session, as the LuCI contract asks.
 -#}
-
-			</div><!-- /.oasisic-content -->
-		</main><!-- /#maincontent -->
-	</div><!-- /#app -->
-
-	<script src="{{ media }}/js/dashboard.js"></script>
-	<script>
-		Oasisic.init();
-	</script>
-	<script type="text/javascript">L.require('menu-oasisic')</script>
+{% if (blank_page): %}
+</div>
+{% else %}
+		</div><!-- /.oasisic-content -->
+	</main>
+</div><!-- /.oasisic-layout -->
+{%
+	const dist_ver = match(version.distversion ?? '', /^[0-9A-Za-z][0-9A-Za-z.+-]*/);
+	const luci_ver = match(version.luciversion ?? '', /[0-9]+\.[0-9]+/);
+-%}
+{% if (ctx.authsession): %}
+<footer class="oasisic-foot">
+	<span>{{ entityencode(version.distname ?? 'OpenWrt', true) }}{{ dist_ver ? ' ' + entityencode(dist_ver[0], true) : '' }}</span>
+	<span class="oasisic-foot-sep" aria-hidden="true">·</span>
+	<span>LuCI{{ luci_ver ? ' ' + entityencode(luci_ver[0], true) : '' }}</span>
+</footer>
+{% endif %}
+{% endif %}
+<script src="{{ media }}/js/theme.js"></script>
+{% if (ctx.authsession && !blank_page): %}
+<script>L.require('menu-oasisic');</script>
+{% endif %}
 </body>
 </html>

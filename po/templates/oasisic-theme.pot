@@ -1,0 +1,25 @@
+# Oasisic theme translation template.
+# Strings here are theme-owned (domain "oasisic-theme"); LuCI core strings
+# such as "Log in" and "Username" live in luci-base and are not duplicated.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: luci-theme-oasisic\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Main navigation"
+msgstr ""
+
+msgid "Toggle navigation"
+msgstr ""
+
+msgid "Toggle appearance"
+msgstr ""
+
+msgid "Skip to content"
+msgstr ""
+
+msgid "Log out"
+msgstr ""
